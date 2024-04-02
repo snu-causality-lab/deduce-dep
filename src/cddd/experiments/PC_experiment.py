@@ -33,7 +33,7 @@ def _pc_experiment_core(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500
 
         for reliability_criterion in reliability_criterions:
             Accuracy, Precision, Recall, F1, CI_number, Time, \
-                Precision_std, Recall_std, F1_std, CI_number_std, Time_std = pc_evaluation(data_path, real_graph_path, isdiscrete, file_number, alpha, reliability_criterion, ci_tester=ci_tester)
+                Precision_std, Recall_std, F1_std, CI_number_std, Time_std = pc_evaluation(data_path, real_graph_path, file_number, alpha, reliability_criterion, ci_tester=ci_tester)
 
             new_row = [BN, size_of_sampled_dataset, reliability_criterion,
                        Accuracy, Precision, Recall, F1, CI_number, Time,

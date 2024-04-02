@@ -6,7 +6,7 @@ from cddd.deductive_reasoning import deduce_dep
 from cddd.utils import get_num_of_parameters
 
 
-def HITON_PC(data, assoc, target, alpha, is_discrete=True, reliability_criterion='classic', K=1, ci_tester=None):
+def HITON_PC(data, assoc, target, alpha, reliability_criterion='classic', K=1, ci_tester=None):
     size_of_dataset, num_of_variables = np.shape(data)
     # Redesign sepsets
     sepsets = dict()

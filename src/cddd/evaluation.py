@@ -116,7 +116,7 @@ def global_skeleton_metric_evaluation(true_adj_mat, estim_adj_mat):
     return accuracy, precision, recall, f1
 
 
-def cond_evaluation(path, all_number_Para, target_list, real_graph_path, is_discrete, rule, filenumber=10, alaph=0.01, reliability_criterion='classic', K=1, ci_tester=None):
+def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, filenumber=10, alaph=0.01, reliability_criterion='classic', K=1, ci_tester=None):
     # pre_set variables are zero
     Precision = 0
     Recall = 0
@@ -147,13 +147,13 @@ def cond_evaluation(path, all_number_Para, target_list, real_graph_path, is_disc
         assoc = [[0] * kVar for _ in range(kVar)]
 
         for i, target in enumerate(target_list):
-            Oraclepc = HITON_PC_oracle(data, assoc, target, alaph, is_discrete, true_graph, ci_tester=ci_tester)
+            Oraclepc = HITON_PC_oracle(data, assoc, target, alaph, true_graph, ci_tester=ci_tester)
             OraclePC[i] = Oraclepc
 
         sepsets = None
         for i, target in enumerate(target_list):
             start_time = time.time()
-            PC, sepsets, ci_number = HITON_PC(data, assoc, target, alaph, is_discrete, reliability_criterion, K, ci_tester=ci_tester)
+            PC, sepsets, ci_number = HITON_PC(data, assoc, target, alaph, reliability_criterion, K, ci_tester=ci_tester)
             end_time = time.time()
             time_lapsed = end_time - start_time
 
@@ -163,7 +163,7 @@ def cond_evaluation(path, all_number_Para, target_list, real_graph_path, is_disc
             Times.append(time_lapsed)
             ResPC[i] = PC
 
-        correction(ResPC, rule, data, sepsets, alaph)
+        correction(ResPC, rule)
         Distance, F1, Precision, Recall = local_metric_evaluation(Distance, F1, Precision, Recall, ResPC, OraclePC, target_list)
 
         F1s.append(F1 / (length_targets * (m + 1)))
@@ -188,7 +188,7 @@ def cond_evaluation(path, all_number_Para, target_list, real_graph_path, is_disc
         F1s_std, Precisions_std, Recalls_std, CI_numbers_std, Times_std
 
 
-def pc_evaluation(path, real_graph_path, is_discrete, filenumber, alpha, reliability_criterion='classic', ci_tester=None):
+def pc_evaluation(path, real_graph_path, filenumber, alpha, reliability_criterion='classic', ci_tester=None):
     # pre_set variables are zero
     Accuracy = 0
     Precision = 0
@@ -214,7 +214,7 @@ def pc_evaluation(path, real_graph_path, is_discrete, filenumber, alpha, reliabi
         data.columns = [i for i in range(kVar)]
 
         start_time = time.time()
-        estim_adj_mat, sepsets, ci_number = pc(data, alpha, is_discrete, reliability_criterion, ci_tester=ci_tester)
+        estim_adj_mat, sepsets, ci_number = pc(data, alpha, reliability_criterion, ci_tester=ci_tester)
         end_time = time.time()
         time_lapsed = end_time - start_time
         accuracy, precision, recall, f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
@@ -250,7 +250,7 @@ def pc_evaluation(path, real_graph_path, is_discrete, filenumber, alpha, reliabi
         Precisions_std, Recalls_std, F1s_std, CI_numbers_std, Times_std
 
 
-def pc_stable_evaluation(path, real_graph_path, is_discrete, filenumber=10, alpha=0.01, reliability_criterion='classic', K=1, ci_tester=None):
+def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic', K=1, ci_tester=None):
     # pre_set variables are zero
     Accuracy = 0
     Precision = 0
@@ -280,7 +280,7 @@ def pc_stable_evaluation(path, real_graph_path, is_discrete, filenumber=10, alph
         data.columns = [i for i in range(kVar)]
 
         start_time = time.time()
-        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, is_discrete, reliability_criterion, K, ci_tester=ci_tester)
+        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion, K, ci_tester=ci_tester)
         end_time = time.time()
         time_lapsed = end_time - start_time
         accuracy, precision, recall, f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)

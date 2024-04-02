@@ -3,7 +3,7 @@ from itertools import combinations
 import numpy as np
 
 
-def pc_simple(data, target, alpha, is_discrete=True, ci_tester=None):
+def pc_simple(data, target, alpha, ci_tester=None):
     size_of_dataset, num_of_variables = np.shape(data)
     sepset = [[] for _ in range(num_of_variables)]
     ci_number = 0

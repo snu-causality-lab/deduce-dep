@@ -38,7 +38,7 @@ def cond_experiment(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 10
             for correction_rule in correction_rules:
                 for reliability_criterion in reliability_criterions:
                     F1, Precision, Recall, Distance, CI_number, Time, \
-                        F1_std, Precision_std, Recall_std, CI_number_std, Time_std = cond_evaluation(data_path, num_para, list_target, real_graph_path, isdiscrete, correction_rule, file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester)
+                        F1_std, Precision_std, Recall_std, CI_number_std, Time_std = cond_evaluation(data_path, num_para, list_target, real_graph_path, correction_rule, file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester)
 
                     # print("------------------------------------------------------")
                     # print("the BN of dataset is:", BN)

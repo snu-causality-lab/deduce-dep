@@ -1,6 +1,3 @@
-from cddd.cit import cond_indep_test
-
-
 # def deduce_dep(sepsets, ResPC, data, alpha=0.01):
 #     marker = [[0] * len(ResPC) for _ in range(len(ResPC))]  # for order-independent correction
 #
@@ -38,7 +35,7 @@ def OR_correction(ResPC):
                 ResPC[var].append(target)
 
 
-def correction(ResPC, rule, data, sepsets, alpha):
+def correction(ResPC, rule):
     if rule == 'AND':
         AND_correction(ResPC)
 

@@ -33,7 +33,7 @@ def _pc_stable_experiment_core(BN, COLUMNS, K, alpha, dataset_sizes, isdiscrete,
 
         for reliability_criterion in reliability_criterions:
             Accuracy, Precision, Recall, F1, CI_number, Time, \
-                Precision_std, Recall_std, F1_std, CI_number_std, Time_std = pc_stable_evaluation(data_path, real_graph_path, isdiscrete, file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester)
+                Precision_std, Recall_std, F1_std, CI_number_std, Time_std = pc_stable_evaluation(data_path, real_graph_path, file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester)
 
             # print("------------------------------------------------------")
             # print("the BN of dataset is:", BN)

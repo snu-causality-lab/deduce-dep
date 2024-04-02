@@ -5,7 +5,7 @@ import numpy as np
 from cddd.deductive_reasoning import deduce_dep
 
 
-def pc_stable(data, alpha, is_discrete=True, reliability_criterion='classic', K=1, ci_tester=None):
+def pc_stable(data, alpha, reliability_criterion='classic', K=1, ci_tester=None):
     size_of_dataset, num_of_variables = np.shape(data)
     adj_mat = [[1 if i != j else 0 for j in range(num_of_variables)] for i in range(num_of_variables)]
     sepsets = dict()

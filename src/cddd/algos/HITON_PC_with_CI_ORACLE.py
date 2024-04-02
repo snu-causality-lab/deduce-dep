@@ -4,7 +4,7 @@ import networkx as nx
 import numpy as np
 
 
-def HITON_PC_oracle(data, assoc, target, alpha, is_discrete, true_graph, ci_tester=None):
+def HITON_PC_oracle(data, assoc, target, alpha, true_graph, ci_tester=None):
     size_of_dataset, num_of_variables = np.shape(data)
     sepsets = dict()
     OPEN = []
