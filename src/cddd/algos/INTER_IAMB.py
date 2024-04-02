@@ -1,9 +1,7 @@
 import numpy as np
 
-from cddd.cit import cond_indep_test
 
-
-def INTER_IAMB(data, target, alpha, is_discrete=True):
+def INTER_IAMB(data, target, alpha, is_discrete=True, ci_tester=None):
     size_of_dataset, num_of_variables = np.shape(data)
     sepset = [[] for _ in range(num_of_variables)]
     ci_number = 0
@@ -21,7 +19,8 @@ def INTER_IAMB(data, target, alpha, is_discrete=True):
         variables = [i for i in range(num_of_variables) if i != target and i not in MB and i not in removeSet]
         # growing phase
         for s in variables:
-            pval_gp, dep_gp = cond_indep_test(data, target, s, MB, is_discrete)
+            # pval_gp, dep_gp = cond_indep_test(data, target, s, MB, is_discrete)
+            pval_gp, dep_gp = ci_tester.ci_test(data, target, s, MB)
             ci_number += 1
 
             if dep_gp > dep_temp:
@@ -43,7 +42,8 @@ def INTER_IAMB(data, target, alpha, is_discrete=True):
             x = MB[mb_index]
 
             subsets_Variables = [i for i in MB if i != x]
-            pval_sp, dep_sp = cond_indep_test(data, target, x, subsets_Variables, is_discrete)
+            # pval_sp, dep_sp = cond_indep_test(data, target, x, subsets_Variables, is_discrete)
+            pval_sp, dep_sp = ci_tester.ci_test(data, target, x, subsets_Variables)
             ci_number += 1
 
             if pval_sp > alpha:

@@ -8,17 +8,18 @@ import numpy as np
 import pandas as pd
 from numpy.random import randint, choice
 
-from cddd.cit import cond_indep_test
+from cddd.cit import ci_test_factory
 from cddd.deductive_reasoning import deduce_dep
 from cddd.evaluation import get_adj_mat
 from cddd.sampling import shuffled
 
 
-def new_fn_experiment(BN, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30):
+def new_fn_experiment(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30):
     # experiments settings
     Alphas = [0.01, 0.05]
     Ks = [0, 1, 2]
     random.seed(0)
+    ci_tester = ci_test_factory(ci_tester_name)
 
     for alpha, K in product(Alphas, Ks):
         # experiment results
@@ -41,7 +42,7 @@ def new_fn_experiment(BN, working_dir, dataset_sizes=(200, 500, 1000, 2000), sam
                 number_of_data, num_vars = np.shape(data)
                 data.columns = [i for i in range(num_vars)]
 
-                result_mth = fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, 20)
+                result_mth = fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, 20, ci_tester=ci_tester)
 
                 result.extend(result_mth)
 
@@ -54,7 +55,7 @@ def new_fn_experiment(BN, working_dir, dataset_sizes=(200, 500, 1000, 2000), sam
             df_for_result.to_csv(result_file_path, mode='a', header=False)
 
 
-def fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, n_repeats=20):
+def fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, n_repeats=20, ci_tester=None):
     result_mth = []
     sepsets = dict()
     consets = dict()
@@ -69,11 +70,12 @@ def fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, tr
         X, Y, *_ = shuffled(Vs - Zs)
 
         truth = nx.d_separated(true_graph, {X}, {Y}, Zs)
-        pval, _ = cond_indep_test(data, X, Y, list(Zs))
+        # pval, _ = cond_indep_test(data, X, Y, list(Zs))
+        pval, _ = ci_tester.ci_test(data, X, Y, list(Zs))
         stat_estim = (pval > alpha)
 
         if pval > alpha:
-            deduce_estim = not (deduce_dep(data, X, Y, list(Zs), K, alpha, add_ci_set, sepsets, consets))
+            deduce_estim = not (deduce_dep(data, X, Y, list(Zs), K, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester))
         else:
             deduce_estim = False
 

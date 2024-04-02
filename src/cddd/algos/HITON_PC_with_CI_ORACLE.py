@@ -3,10 +3,8 @@ from itertools import combinations
 import networkx as nx
 import numpy as np
 
-from cddd.cit import cond_indep_test
 
-
-def HITON_PC_oracle(data, assoc, target, alpha, is_discrete, true_graph):
+def HITON_PC_oracle(data, assoc, target, alpha, is_discrete, true_graph, ci_tester=None):
     size_of_dataset, num_of_variables = np.shape(data)
     sepsets = dict()
     OPEN = []
@@ -14,7 +12,8 @@ def HITON_PC_oracle(data, assoc, target, alpha, is_discrete, true_graph):
 
     total_variables = [var for var in range(num_of_variables) if var != target]
     for x in total_variables:
-        pval_gp, dep_gp = cond_indep_test(data, target, x, [], is_discrete)
+        # pval_gp, dep_gp = cond_indep_test(data, target, x, [], is_discrete)
+        pval_gp, dep_gp = ci_tester.ci_test(data, target, x, [])
         assoc[target][x] = dep_gp
 
         if pval_gp <= alpha:

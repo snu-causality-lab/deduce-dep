@@ -108,6 +108,8 @@ if __name__ == '__main__':
     # To freshly generate data, delete Ground_truth and Sampled_datasets before running this script
     warnings.filterwarnings('ignore')
 
+    # You will see (a lot of ignorable) warnings like
+    # [d3blocks] >WARNING> Probability values don't exactly sum to 1. Differ by: -2.220446049250313e-16. Adjusting values.
     WORKING_DIR = '/Users/sanghacklee/Dropbox/python_projs/CD_DD'
     graph_dir = f'{WORKING_DIR}/data/Ground_truth'
     data_dir = f'{WORKING_DIR}/data/Sampled_datasets'

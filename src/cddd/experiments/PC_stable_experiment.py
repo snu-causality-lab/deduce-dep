@@ -3,13 +3,15 @@ from itertools import product
 
 import pandas as pd
 
+from cddd.cit import ci_test_factory
 from cddd.evaluation import pc_stable_evaluation
 
 
-def pc_stable_experiment(BN, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30):
+def pc_stable_experiment(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30):
     reliability_criterions = ['no', 'deductive_reasoning']
     # constants
     isdiscrete = True
+    ci_tester = ci_test_factory(ci_tester_name)
     Ks = [0, 1, 2]
     Alphas = [0.05, 0.01]
     COLUMNS = ['BN', 'size_of_sampled_dataset', 'reliability_criterion',
@@ -18,10 +20,10 @@ def pc_stable_experiment(BN, working_dir, dataset_sizes=(200, 500, 1000, 2000), 
 
     for K, alpha in product(Ks, Alphas):
         # experiment results
-        _pc_stable_experiment_core(BN, COLUMNS, K, alpha, dataset_sizes, isdiscrete, reliability_criterions, sampling_number, working_dir)
+        _pc_stable_experiment_core(BN, COLUMNS, K, alpha, dataset_sizes, isdiscrete, reliability_criterions, sampling_number, working_dir, ci_tester=ci_tester)
 
 
-def _pc_stable_experiment_core(BN, COLUMNS, K, alpha, dataset_sizes, isdiscrete, reliability_criterions, sampling_number, working_dir):
+def _pc_stable_experiment_core(BN, COLUMNS, K, alpha, dataset_sizes, isdiscrete, reliability_criterions, sampling_number, working_dir, ci_tester=None):
     result = []
     for size_of_sampled_dataset in dataset_sizes:
         real_graph_path = f"{working_dir}/data/Ground_truth/" + BN + "_true.txt"
@@ -31,7 +33,7 @@ def _pc_stable_experiment_core(BN, COLUMNS, K, alpha, dataset_sizes, isdiscrete,
 
         for reliability_criterion in reliability_criterions:
             Accuracy, Precision, Recall, F1, CI_number, Time, \
-                Precision_std, Recall_std, F1_std, CI_number_std, Time_std = pc_stable_evaluation(data_path, real_graph_path, isdiscrete, file_number, alpha, reliability_criterion, K=K)
+                Precision_std, Recall_std, F1_std, CI_number_std, Time_std = pc_stable_evaluation(data_path, real_graph_path, isdiscrete, file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester)
 
             # print("------------------------------------------------------")
             # print("the BN of dataset is:", BN)

@@ -2,20 +2,22 @@ import os
 
 import pandas as pd
 
+from cddd.cit import ci_test_factory
 from cddd.evaluation import pc_evaluation
 
 
-def pc_experiment(BN, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30, alphas=(0.01, 0.05)):
+def pc_experiment(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30, alphas=(0.01, 0.05)):
     for alpha in alphas:
-        _pc_experiment_core(BN, working_dir, dataset_sizes, sampling_number, alpha)
+        _pc_experiment_core(BN, ci_tester_name, working_dir, dataset_sizes, sampling_number, alpha)
 
 
-def _pc_experiment_core(BN, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30, alpha=0.05):
+def _pc_experiment_core(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30, alpha=0.05):
     assert alpha == 0.01 or alpha == 0.05
     alpha_str = {0.01: '001', 0.05: '005'}
     reliability_criterions = ['no', 'deductive_reasoning']
     # constants
     isdiscrete = True
+    ci_tester = ci_test_factory(ci_tester_name)
 
     # experiment results
     columns = ['BN', 'size_of_sampled_dataset', 'reliability_criterion',
@@ -31,7 +33,7 @@ def _pc_experiment_core(BN, working_dir, dataset_sizes=(200, 500, 1000, 2000), s
 
         for reliability_criterion in reliability_criterions:
             Accuracy, Precision, Recall, F1, CI_number, Time, \
-                Precision_std, Recall_std, F1_std, CI_number_std, Time_std = pc_evaluation(data_path, real_graph_path, isdiscrete, file_number, alpha, reliability_criterion)
+                Precision_std, Recall_std, F1_std, CI_number_std, Time_std = pc_evaluation(data_path, real_graph_path, isdiscrete, file_number, alpha, reliability_criterion, ci_tester=ci_tester)
 
             new_row = [BN, size_of_sampled_dataset, reliability_criterion,
                        Accuracy, Precision, Recall, F1, CI_number, Time,

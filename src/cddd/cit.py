@@ -16,6 +16,8 @@ import warnings
 from typing import Tuple
 
 import numpy as np
+import statsmodels.formula.api as sm
+from causallearn.utils.cit import CIT
 from scipy.stats import chi2
 
 warnings.filterwarnings('ignore')
@@ -202,7 +204,7 @@ class CITester:
 
 class G2Tester(CITester):
     def __init__(self):
-        pass
+        super().__init__()
 
     def ci_test(self, data, X, Y, cond_set=frozenset()):
         pval, dep = g2_test_dis(data, X, Y, cond_set)
@@ -211,12 +213,41 @@ class G2Tester(CITester):
 
 class PartialCorrelation(CITester):
     def __init__(self):
-        pass
+        super().__init__()
 
     def ci_test(self, data, X, Y, cond_set=frozenset()):
-        # TODO
-        # mod = sm.OLS(Y, X)
-        # fii = mod.fit()
-        # p_values = fii.summary2().tables[1]['P>|t|']
-        pval = 0
+        X, Y = str(X), str(Y)
+
+        Zs = ''.join([f' + {_}' for _ in cond_set])
+        result = sm.ols(formula=f"{X} ~ {Y} {Zs}", data=data).fit()
+        p_values = result.summary2().tables[1]['P>|t|']
+        pval = p_values[Y]
+        # Note that X and Y are symmetric
+
         return pval, -pval
+
+
+class KernelCITest(CITester):
+    def __init__(self):
+        super().__init__()
+
+    def ci_test(self, data, X, Y, cond_set=frozenset()):
+        data_matrix = data.to_numpy()
+        idx = {col: i for i, col in enumerate(data.columns)}
+        kci_obj = CIT(data_matrix, "kci",
+                      KernelX='GaussianKernel',
+                      KernelY='GaussianKernel',
+                      KernelZ='GaussianKernel', approx=False, est_width='median')
+        pval = kci_obj([idx[X]], [idx[Y]], [idx[z] for z in cond_set])
+        return pval, -pval
+
+
+def ci_test_factory(name):
+    if name == 'G2':
+        return G2Tester()
+    elif name == 'ParCorr':
+        return PartialCorrelation()
+    elif name == 'KCI':
+        return KernelCITest()
+    else:
+        raise AssertionError(f'unknown CI tester: {name}')

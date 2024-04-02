@@ -1,7 +1,4 @@
-from cddd.cit import cond_indep_test
-
-
-def deduce_dep(data, X, Y, Z, k, alpha, add_ci_set, sepsets, consets=None):
+def deduce_dep(data, X, Y, Z, k, alpha, add_ci_set, sepsets, consets=None, ci_tester=None):
     if consets is None:
         consets = dict()
     if len(Z) > k:
@@ -19,12 +16,13 @@ def deduce_dep(data, X, Y, Z, k, alpha, add_ci_set, sepsets, consets=None):
                     pval = 0
 
                 else:
-                    pval, _ = cond_indep_test(data, A, B, C)
+                    # pval, _ = cond_indep_test(data, A, B, C)
+                    pval, _ = ci_tester.ci_test(data, A, B, C)
                     add_ci_set.append('1')
 
                 if pval > alpha:
                     if not is_already_identified:
-                        if not deduce_dep(data, A, B, C, k, alpha, add_ci_set, sepsets, consets):
+                        if not deduce_dep(data, A, B, C, k, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester):
                             sepsets[tuple(sorted([A, B]))] = C
                         else:
                             consets[tuple(sorted([A, B]))] = C

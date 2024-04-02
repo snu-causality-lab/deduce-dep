@@ -3,12 +3,14 @@ from itertools import product
 
 import pandas as pd
 
+from cddd.cit import ci_test_factory
 from cddd.evaluation import cond_evaluation
 
 
-def cond_experiment(BN, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30):
+def cond_experiment(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30):
     reliability_criterions = ['no', 'deductive_reasoning']
     correction_rules = ['AND']
+    ci_tester = ci_test_factory(ci_tester_name)
 
     # constants
     isdiscrete = True
@@ -36,7 +38,7 @@ def cond_experiment(BN, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampl
             for correction_rule in correction_rules:
                 for reliability_criterion in reliability_criterions:
                     F1, Precision, Recall, Distance, CI_number, Time, \
-                        F1_std, Precision_std, Recall_std, CI_number_std, Time_std = cond_evaluation(data_path, num_para, list_target, real_graph_path, isdiscrete, correction_rule, file_number, alpha, reliability_criterion, K=K)
+                        F1_std, Precision_std, Recall_std, CI_number_std, Time_std = cond_evaluation(data_path, num_para, list_target, real_graph_path, isdiscrete, correction_rule, file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester)
 
                     # print("------------------------------------------------------")
                     # print("the BN of dataset is:", BN)

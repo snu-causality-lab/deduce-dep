@@ -5,7 +5,7 @@ from collections import Counter
 import pandas as pd
 from numpy.random import randint, choice
 
-from cddd.cit import cond_indep_test
+from cddd.cit import ci_test_factory
 from cddd.deductive_reasoning import deduce_dep
 from cddd.sampling import random_BN, shuffled
 
@@ -19,7 +19,7 @@ def _fn_experiment_core(working_dir, alpha, nums_vars, times_vars, dataset_sizes
     assert alpha in {0.01, 0.05}
     alpha_str = {0.01: '001', 0.05: '005'}
     # experiments settings
-
+    ci_tester = ci_test_factory('G2')
     # experiment results
     columns = ['num_vars', 'num_edges', 'data_set_size', 'is_deductive_reasoning',
                'Accuracy', 'Precision', 'Recall', 'F1']
@@ -54,11 +54,12 @@ def _fn_experiment_core(working_dir, alpha, nums_vars, times_vars, dataset_sizes
                         X, Y, *_ = shuffled(bn.Vs - Zs)
 
                         truth = bn.is_d_separated({X}, {Y}, Zs)
-                        pval, _ = cond_indep_test(data, X, Y, list(Zs))
+                        # pval, _ = cond_indep_test(data, X, Y, list(Zs))
+                        pval, _ = ci_tester.ci_test(data, X, Y, list(Zs))
                         stat_estim = (pval > alpha)
 
                         if pval > alpha:
-                            deduce_estim = not (deduce_dep(data, X, Y, list(Zs), 1, alpha, add_ci_set, sepsets, consets))
+                            deduce_estim = not (deduce_dep(data, X, Y, list(Zs), 1, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester))
                         else:
                             deduce_estim = False
 

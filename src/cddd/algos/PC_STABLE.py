@@ -2,11 +2,10 @@ from itertools import combinations
 
 import numpy as np
 
-from cddd.cit import cond_indep_test
 from cddd.deductive_reasoning import deduce_dep
 
 
-def pc_stable(data, alpha, is_discrete=True, reliability_criterion='classic', K=1):
+def pc_stable(data, alpha, is_discrete=True, reliability_criterion='classic', K=1, ci_tester=None):
     size_of_dataset, num_of_variables = np.shape(data)
     adj_mat = [[1 if i != j else 0 for j in range(num_of_variables)] for i in range(num_of_variables)]
     sepsets = dict()
@@ -25,11 +24,12 @@ def pc_stable(data, alpha, is_discrete=True, reliability_criterion='classic', K=
                 if len(conditioning_set_pool) >= k:
                     k_length_conditioning_sets = combinations(conditioning_set_pool, k)
                     for cond_set in k_length_conditioning_sets:
-                        pval, _ = cond_indep_test(data, target, candidate, cond_set, is_discrete)
+                        # pval, _ = cond_indep_test(data, target, candidate, cond_set, is_discrete)
+                        pval, _ = ci_tester.ci_test(data, target, candidate, cond_set)
                         ci_number += 1
                         if pval > alpha:
                             if is_deductive_reasoning:
-                                if not deduce_dep(data, target, candidate, cond_set, K, alpha, add_ci_set, sepsets, consets):
+                                if not deduce_dep(data, target, candidate, cond_set, K, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester):
                                     sepsets[tuple(sorted([target, candidate]))] = cond_set
                                     marker.append([tuple(sorted([target, candidate])), cond_set])
                                     break

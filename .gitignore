@@ -1,1 +1,4 @@
 .idea
+results
+data/Ground_truth
+data/Sampled_datasets

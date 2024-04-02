@@ -2,12 +2,11 @@ from itertools import combinations
 
 import numpy as np
 
-from cddd.cit import cond_indep_test
 from cddd.deductive_reasoning import deduce_dep
 from cddd.utils import get_num_of_parameters
 
 
-def HITON_PC(data, assoc, target, alpha, is_discrete=True, reliability_criterion='classic', K=1):
+def HITON_PC(data, assoc, target, alpha, is_discrete=True, reliability_criterion='classic', K=1, ci_tester=None):
     size_of_dataset, num_of_variables = np.shape(data)
     # Redesign sepsets
     sepsets = dict()
@@ -26,7 +25,8 @@ def HITON_PC(data, assoc, target, alpha, is_discrete=True, reliability_criterion
         # classic reliability criterion : h-ps
         num_of_parameters_for_cit = get_num_of_parameters(data, target, x, [])
         if size_of_dataset >= h_ps * num_of_parameters_for_cit:
-            pval_gp, dep_gp = cond_indep_test(data, target, x, [], is_discrete)
+            # pval_gp, dep_gp = cond_indep_test(data, target, x, [], is_discrete)
+            pval_gp, dep_gp = ci_tester.ci_test(data, target, x, [])
             assoc[target][x] = dep_gp
             ci_number += 1
 
@@ -69,13 +69,14 @@ def HITON_PC(data, assoc, target, alpha, is_discrete=True, reliability_criterion
                     elif tuple(sorted([target, TPC_var])) in consets and consets[tuple(sorted([target, TPC_var]))] == cond_set:
                         pval_rm = 0
                     else:
-                        pval_rm, dep_rm = cond_indep_test(data, target, TPC_var, cond_set, is_discrete)
+                        # pval_rm, dep_rm = cond_indep_test(data, target, TPC_var, cond_set, is_discrete)
+                        pval_rm, dep_rm = ci_tester.ci_test(data, target, TPC_var, cond_set)
                         ci_number += 1
 
                     if pval_rm > alpha:
                         # new reliability criterion : deductive reasoning
                         if is_deductive_reasoning:
-                            if not deduce_dep(data, target, TPC_var, cond_set, K, alpha, add_ci_set, sepsets, consets):
+                            if not deduce_dep(data, target, TPC_var, cond_set, K, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester):
                                 sepsets[tuple(sorted([target, TPC_var]))] = cond_set
                                 TPC.remove(TPC_var)
                                 break
