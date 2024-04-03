@@ -54,7 +54,6 @@ def pc_stable(data, alpha, reliability_criterion='classic', is_orientation = Fal
     if not is_orientation:
         return adj_mat, sepsets, ci_number
     else:
-        adj_mat = np.array(adj_mat)
         skel_graph = nx.DiGraph(adj_mat)
         dag = estimate_cpdag(skel_graph, sepsets)
         adj_mat = nx.to_numpy_array(dag)
@@ -74,8 +73,7 @@ def estimate_cpdag(skel_graph, sep_set):
     Returns:
         An estimated DAG.
     """
-    # dag = skel_graph.to_directed()
-    dag = skel_graph
+    dag = skel_graph.to_directed()
     node_ids = skel_graph.nodes()
     for (i, j) in combinations(node_ids, 2):
         adj_i = set(dag.successors(i))

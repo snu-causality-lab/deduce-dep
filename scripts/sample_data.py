@@ -4,6 +4,7 @@ import random
 import warnings
 from itertools import product
 from pathlib import Path
+from scipy.special import expit as sigmoid
 from typing import Dict, Tuple, Sequence, TypeVar, Hashable
 
 import bnlearn as bn
@@ -102,6 +103,91 @@ def sample_from_bif(working_dir, bif_bn, sizes, sampling_number):
     # Sampling data from the BN
     Parallel(n_jobs=mp.cpu_count())(delayed(data_sampling)(size, sampling_number) for size in sizes)
 
+def sample_linear_sem(num_vars, edge_ratio, num_sampling, size, working_dir, seed=None):
+    if seed is not None:
+        random.seed(seed)
+        np.random.seed(seed)
+
+    num_edges = int(num_vars * edge_ratio)
+    BN_name = f'Linear_{num_vars}_{num_edges}'
+
+    # Generate graph
+    B = nx.gnm_random_graph(num_vars, num_edges)
+    B = nx.to_numpy_array(B)
+    B = np.tril(B, -1)
+    G = nx.DiGraph(B)
+
+    # save ground truth file
+    adj_mat_df = pd.DataFrame(B, columns=[i for i in range(num_vars)], dtype=np.int32)
+    adj_mat_df_path = f'{working_dir}/data/Ground_truth/{BN_name}_true.txt'
+    adj_mat_df.to_csv(adj_mat_df_path, sep=" ", header=None, index=False)
+
+    # Generate weight matrix
+    w_ranges = ((-2, -0.5), (0.5, 2))
+    W = np.zeros(B.shape)
+    S = np.random.randint(len(w_ranges), size=B.shape)  # which range
+
+    for i, (low, high) in enumerate(w_ranges):
+        U = np.random.uniform(low=low, high=high, size=B.shape)
+        W += B * (S == i) * U
+
+    # Sampling from linear SEM
+    ordered_nodes = list(nx.topological_sort(G))
+    scale_vec = np.ones(num_vars)
+
+    for i in range(1, num_sampling + 1):
+        X = np.zeros([size, num_vars])
+        for j in ordered_nodes:
+            parents = tuple(G.predecessors(j))
+            X[:, j] = X[:, parents] @ W[parents, j] + np.random.normal(scale = scale_vec[j], size = size)
+
+        sampled_data = pd.DataFrame(X, columns=[i for i in range(num_vars)], dtype=np.float32)
+        sampled_data_path = f'{working_dir}/data/Sampled_datasets/{BN_name}_{size}_v{i}.csv'
+        sampled_data.to_csv(sampled_data_path, index=False)
+
+
+def sample_nonlinear_sem(num_vars, edge_ratio, num_sampling, size, working_dir, seed=None):
+    if seed is not None:
+        random.seed(seed)
+        np.random.seed(seed)
+
+    num_edges = int(num_vars * edge_ratio)
+    BN_name = f'Nonlinear_{num_vars}_{num_edges}'
+
+    # Generate graph
+    B = nx.gnm_random_graph(num_vars, num_edges)
+    B = nx.to_numpy_array(B)
+    B = np.tril(B, -1)
+    G = nx.DiGraph(B)
+
+    # save ground truth file
+    adj_mat_df = pd.DataFrame(B, columns=[i for i in range(num_vars)], dtype=np.int32)
+    adj_mat_df_path = f'{working_dir}/data/Ground_truth/{BN_name}_true.txt'
+    adj_mat_df.to_csv(adj_mat_df_path, sep=" ", header=None, index=False)
+
+    # Sampling from nonlinear SEM (using MLP)
+    ordered_nodes = list(nx.topological_sort(G))
+    scale_vec = np.ones(num_vars)
+
+    for i in range(1, num_sampling + 1):
+        X = np.zeros([size, num_vars])
+        for j in ordered_nodes:
+            parents = tuple(G.predecessors(j))
+
+            hidden = 100
+            pa_size = X[:, parents].shape[1]
+
+            z = np.random.normal(scale=scale_vec[j], size=size)
+            W1 = np.random.uniform(low=0.5, high=2.0, size=[pa_size, hidden])
+            W1[np.random.rand(*W1.shape) < 0.5] *= -1
+            W2 = np.random.uniform(low=0.5, high=2.0, size=hidden)
+            W2[np.random.rand(hidden) < 0.5] *= -1
+            X[:, j] = sigmoid(X[:, parents] @ W1) @ W2 + z
+
+        sampled_data = pd.DataFrame(X, columns=[i for i in range(num_vars)], dtype=np.float32)
+        sampled_data_path = f'{working_dir}/data/Sampled_datasets/{BN_name}_{size}_v{i}.csv'
+        sampled_data.to_csv(sampled_data_path, index=False)
+
 
 if __name__ == '__main__':
     # It will take about ~55 secs for Macbook M1 pro
@@ -110,7 +196,8 @@ if __name__ == '__main__':
 
     # You will see (a lot of ignorable) warnings like
     # [d3blocks] >WARNING> Probability values don't exactly sum to 1. Differ by: -2.220446049250313e-16. Adjusting values.
-    WORKING_DIR = '/Users/sanghacklee/Dropbox/python_projs/CD_DD'
+    WORKING_DIR = '/Users/gimjonghwan/Desktop/CD_DD'
+    # '/Users/sanghacklee/Dropbox/python_projs/CD_DD'
     graph_dir = f'{WORKING_DIR}/data/Ground_truth'
     data_dir = f'{WORKING_DIR}/data/Sampled_datasets'
 
@@ -123,20 +210,40 @@ if __name__ == '__main__':
     dataset_sizes = (200, 500, 1000, 2000)
 
     # generate data for BNLearn models
-    print('generating datasets for known BNLearn graphs...')
-    BIF_BNs = ('alarm', 'asia', 'child', 'insurance', 'sachs', 'water')
-    for bif_bn in BIF_BNs:
-        print(f'    {bif_bn} ... ')
-        sample_from_bif(WORKING_DIR, bif_bn, dataset_sizes, num_sampling)
+    # print('generating datasets for known BNLearn graphs...')
+    # BIF_BNs = ('alarm', 'asia', 'child', 'insurance', 'sachs', 'water')
+    # for bif_bn in BIF_BNs:
+    #     print(f'    {bif_bn} ... ')
+    #     sample_from_bif(WORKING_DIR, bif_bn, dataset_sizes, num_sampling)
+    #
+    # print('generating new-style random datasets.')  # post-submission
+    # # generate data for Erdos-Renyi
+    # Parallel(n_jobs=multiprocessing.cpu_count())(
+    #     delayed(sample_ER_dataset)(
+    #         num_vars, edge_ratio, num_sampling, size, WORKING_DIR, seed=i)
+    #     for i, (num_vars, edge_ratio, size)
+    #     in enumerate(product(nums_vars, edge_ratios, dataset_sizes))
+    # )
+    #
+    # print('generating previous style random datasets.')  # in the submission
+    # sample_synthetic_dataset(5, 10, 10, 200, WORKING_DIR, seed=0)
 
-    print('generating new-style random datasets.')  # post-submission
-    # generate data for Erdos-Renyi
+    print('generating linear SEM datasets.')  # post-submission : Linear SEM
+    # generate data from linear SEM
     Parallel(n_jobs=multiprocessing.cpu_count())(
-        delayed(sample_ER_dataset)(
+        delayed(sample_linear_sem)(
             num_vars, edge_ratio, num_sampling, size, WORKING_DIR, seed=i)
         for i, (num_vars, edge_ratio, size)
         in enumerate(product(nums_vars, edge_ratios, dataset_sizes))
     )
 
-    print('generating previous style random datasets.')  # in the submission
-    sample_synthetic_dataset(5, 10, 10, 200, WORKING_DIR, seed=0)
+    print('generating nonlinear SEM datasets.')  # post-submission : Linear SEM
+    # generate data from nonlinear SEM (using MLP)
+    Parallel(n_jobs=multiprocessing.cpu_count())(
+        delayed(sample_nonlinear_sem)(
+            num_vars, edge_ratio, num_sampling, size, WORKING_DIR, seed=i)
+        for i, (num_vars, edge_ratio, size)
+        in enumerate(product(nums_vars, edge_ratios, dataset_sizes))
+    )
+
+

@@ -316,58 +316,6 @@ def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, relia
         Precisions_std, Recalls_std, F1s_std, CI_numbers_std, Times_std
 
 
-def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic', K=1, ci_tester=None):
-    # pre_set variables are zero
-    total_SHD = 0
-    total_ci_number = 0
-    total_time = 0
-
-    SHDs = []
-    CI_numbers = []
-    Times = []
-
-    examplePath = path + str(1) + ".csv"
-    data = pd.read_csv(examplePath)
-    number, all_number_Para = np.shape(data)
-
-    true_adj_mat = get_adj_mat(all_number_Para, real_graph_path)
-    true_graph = nx.DiGraph(true_adj_mat)
-    oracle_adj_mat = pc_stable_oracle(true_adj_mat, true_graph, is_orientation = True)
-
-    for m in range(filenumber):
-        completePath = path + str(m + 1) + ".csv"
-        data = pd.read_csv(completePath)
-        number, kVar = np.shape(data)
-        data.columns = [i for i in range(kVar)]
-
-        start_time = time.time()
-        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion, is_orientation = True, K = K, ci_tester=ci_tester)
-        end_time = time.time()
-        time_lapsed = end_time - start_time
-        SHD = np.sum(np.abs(estim_adj_mat, oracle_adj_mat))
-
-        SHDs.append(SHD)
-        CI_numbers.append(ci_number)
-        Times.append(time_lapsed)
-
-        total_SHD += SHD
-        total_ci_number += ci_number
-        total_time += time_lapsed
-
-    commonDivisor = filenumber
-
-    SHDs = np.array(SHD)
-    CI_numbers = np.array(CI_numbers)
-    Times = np.array(Times)
-
-    SHDs_std = np.std(SHDs)
-    CI_numbers_std = np.std(CI_numbers)
-    Times_std = np.std(Times)
-
-    return total_SHD / commonDivisor, total_ci_number / commonDivisor, total_time / commonDivisor, \
-        SHDs_std, CI_numbers_std, Times_std
-
-
 def get_adj_dict(real_graph_path):
     adj_dict = collections.defaultdict(list)
     with open(real_graph_path) as fileobject:

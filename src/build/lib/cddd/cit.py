@@ -16,7 +16,6 @@ import warnings
 from typing import Tuple
 
 import numpy as np
-import pandas as pd
 import statsmodels.formula.api as sm
 from causallearn.utils.cit import CIT
 from scipy.stats import chi2
@@ -218,13 +217,13 @@ class PartialCorrelation(CITester):
 
     def ci_test(self, data, X, Y, cond_set=frozenset()):
         X, Y = str(X), str(Y)
+
         Zs = ''.join([f' + {_}' for _ in cond_set])
-
-        result = sm.ols(formula= f"{X} ~ {Y} {Zs}", data=data).fit()
-
+        result = sm.ols(formula=f"{X} ~ {Y} {Zs}", data=data).fit()
         p_values = result.summary2().tables[1]['P>|t|']
         pval = p_values[Y]
         # Note that X and Y are symmetric
+
         return pval, -pval
 
 
