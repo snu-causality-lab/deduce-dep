@@ -12,6 +12,7 @@ from cddd.algos.PC_STABLE import pc_stable
 from cddd.algos.PC_STABLE_with_CI_ORACLE import pc_stable_oracle
 from cddd.algos.PC_with_CI_ORACLE import pc_oracle
 from cddd.correction import correction
+from itertools import combinations
 
 
 #
@@ -114,6 +115,25 @@ def global_skeleton_metric_evaluation(true_adj_mat, estim_adj_mat):
     f1 = ((2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0)
 
     return accuracy, precision, recall, f1
+
+def DAG_to_CPDAG(adj_mat):
+    GT = nx.DiGraph(adj_mat)
+    nodes = list(GT.nodes)
+
+    adj_mat = adj_mat + adj_mat.T
+
+    # 문제의 소지가 있음! 가령 한 노드에 여러 개의 collider가 존재할 때 결과가 제대로 나오는지 의문.
+    for a, b in combinations(nodes, r=2):
+        if (not adj_mat[a][b]) and (not adj_mat[b][a]):
+            common_child = set(GT.successors(a)) & set(GT.successors(b))
+            for child in common_child:
+                adj_mat[a][child] = 1
+                adj_mat[child][a] = 0
+                adj_mat[b][child] = 1
+                adj_mat[child][b] = 0
+    return adj_mat
+
+
 
 def get_SHD(oracle_adj_mat, estim_adj_mat):
     # DAG -> CPDAG
@@ -351,7 +371,8 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion, is_orientation = True, K = K, ci_tester=ci_tester)
         end_time = time.time()
         time_lapsed = end_time - start_time
-        SHD = get_SHD(oracle_adj_mat, estim_adj_mat)
+        oracle_CPDAG_adj_mat = DAG_to_CPDAG(oracle_adj_mat)
+        SHD = get_SHD(oracle_CPDAG_adj_mat, estim_adj_mat)
 
         SHDs.append(SHD)
         CI_numbers.append(ci_number)

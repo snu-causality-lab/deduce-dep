@@ -21,15 +21,18 @@ if __name__ == '__main__':
     Path(results_dir).mkdir(parents=True, exist_ok=True)
 
     if EXPERIMENTAL_RUN:
-        BNs = ['Linear_10_20']
-        CITs = ['KCI']
+        # BNs = ['Linear_10_20']
+        # CITs = ['KCI']
 
         # BNs = ['ER_10_12', 'alarm']
         # CITs = ['G2', 'G2']
-        nums_vars = (10,)
-        edge_ratios = (1.2,)
-        dataset_sizes = (200,)
-        num_sampling = 3
+
+        BNs = ['ER_20_24', 'ER_20_30', 'ER_20_40', 'alarm', 'insurance', 'sachs']
+        CITs = ['G2'] * len(BNs)
+        # nums_vars = (20,)
+        # edge_ratios = (1.2, 1.5, 2)
+        dataset_sizes = (200, 500, 1000)
+        num_sampling = 30
 
     else:
         # full experimentation
