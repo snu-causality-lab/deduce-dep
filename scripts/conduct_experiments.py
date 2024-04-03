@@ -1,7 +1,6 @@
 import itertools
 import multiprocessing as mp
 from pathlib import Path
-
 from joblib import Parallel, delayed
 
 from cddd.experiments.FN_experiment import fn_experiment
@@ -15,13 +14,14 @@ if __name__ == '__main__':
     ############# just for checking working! #####################
     EXPERIMENTAL_RUN = True
 
-    WORKING_DIR = '/Users/gimjonghwan/Desktop/CD_DD'
+    WORKING_DIR = '/home/jonghwan/CDDD'
+    # WORKING_DIR = '/Users/gimjonghwan/Desktop/CD_DD'
     # '/Users/sanghacklee/Dropbox/python_projs/CD_DD'
     results_dir = f'{WORKING_DIR}/results'
     Path(results_dir).mkdir(parents=True, exist_ok=True)
 
     if EXPERIMENTAL_RUN:
-        BNs = ['Linear_10_15']
+        BNs = ['Linear_10_20']
         CITs = ['KCI']
 
         # BNs = ['ER_10_12', 'alarm']
@@ -47,11 +47,11 @@ if __name__ == '__main__':
     # Parallel(n_jobs=mp.cpu_count())(delayed(new_fn_experiment)(BN, WORKING_DIR, dataset_sizes, num_sampling) for BN in BNs)
     Parallel(n_jobs=mp.cpu_count())(
         itertools.chain(
-            (delayed(cond_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
-            (delayed(pc_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
-            (delayed(pc_stable_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
+            #(delayed(cond_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
+            #(delayed(pc_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
+            #(delayed(pc_stable_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
             (delayed(complete_pc_stable_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
-            (delayed(new_fn_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs))
+            #(delayed(new_fn_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs))
         )
     )
-    fn_experiment(WORKING_DIR, nums_vars, edge_ratios, dataset_sizes)
+    #fn_experiment(WORKING_DIR, nums_vars, edge_ratios, dataset_sizes)

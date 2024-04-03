@@ -115,6 +115,13 @@ def global_skeleton_metric_evaluation(true_adj_mat, estim_adj_mat):
 
     return accuracy, precision, recall, f1
 
+def get_SHD(oracle_adj_mat, estim_adj_mat):
+    # DAG -> CPDAG
+
+    diff = np.abs(oracle_adj_mat - estim_adj_mat)
+    diff = diff + diff.transpose()
+    diff[diff > 1] = 1
+    return np.sum(diff) / 2
 
 def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, filenumber=10, alaph=0.01, reliability_criterion='classic', K=1, ci_tester=None):
     # pre_set variables are zero
@@ -344,7 +351,7 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion, is_orientation = True, K = K, ci_tester=ci_tester)
         end_time = time.time()
         time_lapsed = end_time - start_time
-        SHD = np.sum(np.abs(estim_adj_mat, oracle_adj_mat))
+        SHD = get_SHD(oracle_adj_mat, estim_adj_mat)
 
         SHDs.append(SHD)
         CI_numbers.append(ci_number)
