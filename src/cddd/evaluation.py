@@ -125,28 +125,59 @@ def global_orientation_metric_evaluation(true_adj_mat, estim_adj_mat):
     FN = 0
 
     for var1, var2 in combinations(node_list, 2):
-        # var1 -> var2
-        truth = true_adj_mat[var1][var2]
-        estim = estim_adj_mat[var1][var2]
-        if truth and estim:
+        # identify endpoint var1, var2
+        # types of endpoint : tail (1), arrowhead (2), undirected (3), null (4)
+
+        truth_var1_var2 = true_adj_mat[var1][var2]
+        truth_var2_var1 = true_adj_mat[var2][var1]
+
+        if truth_var1_var2 and truth_var2_var1:
+            true_endpoint_var1 = 3
+            true_endpoint_var2 = 3
+        elif truth_var1_var2 and not truth_var2_var1:
+            true_endpoint_var1 = 1
+            true_endpoint_var2 = 2
+        elif not truth_var1_var2 and truth_var2_var1:
+            true_endpoint_var1 = 2
+            true_endpoint_var2 = 1
+        else:
+            true_endpoint_var1 = 4
+            true_endpoint_var2 = 4
+
+        estim_var1_var2 = estim_adj_mat[var1][var2]
+        estim_var2_var1 = estim_adj_mat[var2][var1]
+
+        if estim_var1_var2 and estim_var2_var1:
+            estim_endpoint_var1 = 3
+            estim_endpoint_var2 = 3
+        elif estim_var1_var2 and not estim_var2_var1:
+            estim_endpoint_var1 = 1
+            estim_endpoint_var2 = 2
+        elif not estim_var1_var2 and estim_var2_var1:
+            estim_endpoint_var1 = 2
+            estim_endpoint_var2 = 1
+        else:
+            estim_endpoint_var1 = 4
+            estim_endpoint_var2 = 4
+
+        # check var1 endpoint
+        if true_endpoint_var1 == 2 and estim_endpoint_var1 == 2:
             TP += 1
-        elif truth and not estim:
-            FN += 1
-        elif not truth and estim:
+        elif not true_endpoint_var1 == 2 and estim_endpoint_var1 == 2:
             FP += 1
-        elif not truth and not estim:
+        elif true_endpoint_var1 == 2 and not estim_endpoint_var1 == 2:
+            FN += 1
+        else:
             TN += 1
 
-        # var2 -> var1
-        truth = true_adj_mat[var2][var1]
-        estim = estim_adj_mat[var2][var1]
-        if truth and estim:
+        # check var2 endpoint
+        if true_endpoint_var2 == 2 and estim_endpoint_var2 == 2:
             TP += 1
-        elif truth and not estim:
-            FN += 1
-        elif not truth and estim:
+        elif not true_endpoint_var2 == 2 and estim_endpoint_var2 == 2:
             FP += 1
-        elif not truth and not estim:
+        elif true_endpoint_var2 == 2 and not estim_endpoint_var2 == 2:
+            FN += 1
+        else:
             TN += 1
 
     accuracy = (TP + TN) / (TP + FN + FP + TN)

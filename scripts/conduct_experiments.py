@@ -33,7 +33,7 @@ if __name__ == '__main__':
         # edge_ratios = (1.2, 1.5, 2)
         # dataset_sizes = (200, 500, 1000)
         dataset_sizes = (200, 500, 1000)
-        num_sampling = 10
+        num_sampling = 30
 
     else:
         # full experimentation
