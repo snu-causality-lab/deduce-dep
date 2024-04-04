@@ -18,6 +18,7 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 import statsmodels.formula.api as sm
+import statsmodels.api as sm2
 from causallearn.utils.cit import CIT
 from scipy.stats import chi2
 
@@ -217,10 +218,13 @@ class PartialCorrelation(CITester):
         super().__init__()
 
     def ci_test(self, data, X, Y, cond_set=frozenset()):
-        X, Y = str(X), str(Y)
-        Zs = ''.join([f' + {_}' for _ in cond_set])
+        # X, Y = str(X), str(Y)
+        # Zs = ''.join([f' + {_}' for _ in cond_set])
+        # X = df_adv[['TV', 'Radio']] y = df_adv['Sales']
+        # X = sm.add_constant(X)
+        # result = sm.ols(formula= f"{X} ~ {Y} {Zs}", data=data).fit()
 
-        result = sm.ols(formula= f"{X} ~ {Y} {Zs}", data=data).fit()
+        result = sm2.OLS(data[X], sm2.add_constant(data[[Y] + list(cond_set)])).fit()
 
         p_values = result.summary2().tables[1]['P>|t|']
         pval = p_values[Y]
