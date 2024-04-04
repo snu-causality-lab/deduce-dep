@@ -15,7 +15,11 @@ def complete_pc_stable_experiment(BN, ci_tester_name, working_dir, dataset_sizes
     Ks = [0, 1, 2]
     Alphas = [0.05, 0.01]
     COLUMNS = ['BN', 'size_of_sampled_dataset', 'reliability_criterion',
+               'adj_accuracy', 'adj_f1', 'adj_precision', 'adj_recall',
+               'arr_accuracy', 'arr_f1', 'arr_precision', 'arr_recall',
                'SHD', 'CI_number', 'Time',
+               'adj_accuracy_std', 'adj_f1_std', 'adj_precision_std', 'adj_recall_std',
+               'arr_accuracy_std', 'arr_f1_std', 'arr_precision_std', 'arr_recall_std',
                'SHD_std', 'CI_number_std', 'Time_std']
 
     for K, alpha in product(Ks, Alphas):
@@ -32,23 +36,9 @@ def _complete_pc_stable_experiment_core(BN, COLUMNS, K, alpha, dataset_sizes, is
         file_number = sampling_number
 
         for reliability_criterion in reliability_criterions:
-            SHD, CI_number, Time, \
-                SHD_std, CI_number_std, Time_std = complete_pc_stable_evaluation(data_path, real_graph_path, file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester)
+            new_row = [BN, size_of_sampled_dataset, reliability_criterion]
+            new_row += list(complete_pc_stable_evaluation(data_path, real_graph_path, file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester))
 
-            # print("------------------------------------------------------")
-            # print("the BN of dataset is:", BN)
-            # print("the size of dataset is:", size_of_sampled_dataset)
-            # print("Reliability criterion:", reliability_criterion)
-            # print()
-            # print("Precision is: " + str("%.2f" % Precision), "with std: " + str("%.2f" % Precision_std))
-            # print("Recall is: " + str("%.2f" % Recall), "with std: " + str("%.2f" % Recall_std))
-            # print("F1 is: " + str("%.2f" % F1), "with std: " + str("%.2f" % F1_std))
-            # print("CI_number is: " + str("%.2f" % CI_number) + " with std: " + str("%.2f" % CI_number_std))
-            # print("Time is: " + str("%.2f" % Time) + " with std: " + str("%.2f" % Time_std))
-
-            new_row = [BN, size_of_sampled_dataset, reliability_criterion,
-                       SHD, CI_number, Time,
-                       SHD_std, CI_number_std, Time_std]
             result.append(new_row)
 
     # write and save the experiment result as a csv file

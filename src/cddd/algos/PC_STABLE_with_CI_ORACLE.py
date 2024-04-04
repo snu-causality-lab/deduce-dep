@@ -14,7 +14,8 @@ def pc_stable_oracle(true_adj_mat, true_graph, is_orientation=False):
     for k in range(num_of_variables - 1):
         marker = []
         for target in range(num_of_variables):
-            adj_target = [i for i in range(num_of_variables) if ((tuple(sorted([target, i])) not in sepsets) and (i != target))]
+            # adj_target = [i for i in range(num_of_variables) if ((tuple(sorted([target, i])) not in sepsets) and (i != target))]
+            adj_target = [i for i in range(num_of_variables) if (adj_mat[i][target] == 1) and (i != target)]
             for candidate in adj_target:
                 conditioning_set_pool = list(set(adj_target) - {candidate})
                 if len(conditioning_set_pool) >= k:

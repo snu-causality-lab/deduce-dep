@@ -116,13 +116,51 @@ def global_skeleton_metric_evaluation(true_adj_mat, estim_adj_mat):
 
     return accuracy, precision, recall, f1
 
+def global_orientation_metric_evaluation(true_adj_mat, estim_adj_mat):
+    num_vars = len(true_adj_mat[0])
+    node_list = [i for i in range(num_vars)]
+    TP = 0
+    TN = 0
+    FP = 0
+    FN = 0
+
+    for var1, var2 in combinations(node_list, 2):
+        # var1 -> var2
+        truth = true_adj_mat[var1][var2]
+        estim = estim_adj_mat[var1][var2]
+        if truth and estim:
+            TP += 1
+        elif truth and not estim:
+            FN += 1
+        elif not truth and estim:
+            FP += 1
+        elif not truth and not estim:
+            TN += 1
+
+        # var2 -> var1
+        truth = true_adj_mat[var2][var1]
+        estim = estim_adj_mat[var2][var1]
+        if truth and estim:
+            TP += 1
+        elif truth and not estim:
+            FN += 1
+        elif not truth and estim:
+            FP += 1
+        elif not truth and not estim:
+            TN += 1
+
+    accuracy = (TP + TN) / (TP + FN + FP + TN)
+    precision = (TP / (TP + FP)) if TP + FP > 0 else 0
+    recall = (TP / (TP + FN)) if TP + FN > 0 else 0
+    f1 = ((2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0)
+
+    return accuracy, precision, recall, f1
+
 def DAG_to_CPDAG(adj_mat):
     GT = nx.DiGraph(adj_mat)
     nodes = list(GT.nodes)
-
     adj_mat = adj_mat + adj_mat.T
 
-    # 문제의 소지가 있음! 가령 한 노드에 여러 개의 collider가 존재할 때 결과가 제대로 나오는지 의문.
     for a, b in combinations(nodes, r=2):
         if (not adj_mat[a][b]) and (not adj_mat[b][a]):
             common_child = set(GT.successors(a)) & set(GT.successors(b))
@@ -132,8 +170,6 @@ def DAG_to_CPDAG(adj_mat):
                 adj_mat[b][child] = 1
                 adj_mat[child][b] = 0
     return adj_mat
-
-
 
 def get_SHD(oracle_adj_mat, estim_adj_mat):
     # DAG -> CPDAG
@@ -345,9 +381,20 @@ def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, relia
 
 def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic', K=1, ci_tester=None):
     # pre_set variables are zero
-    total_SHD = 0
-    total_ci_number = 0
-    total_time = 0
+
+    # total_SHD = 0
+    # total_ci_number = 0
+    # total_time = 0
+
+    adj_accuracies = []
+    adj_f1s = []
+    adj_precisions = []
+    adj_recalls = []
+
+    arr_accuracies = []
+    arr_f1s = []
+    arr_precisions = []
+    arr_recalls = []
 
     SHDs = []
     CI_numbers = []
@@ -371,30 +418,57 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion, is_orientation = True, K = K, ci_tester=ci_tester)
         end_time = time.time()
         time_lapsed = end_time - start_time
+
+        adj_accuracy, adj_precision, adj_recall, adj_f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
+        arr_accuracy, arr_precision, arr_recall, arr_f1 = global_orientation_metric_evaluation(oracle_adj_mat, estim_adj_mat)
+
         oracle_CPDAG_adj_mat = DAG_to_CPDAG(oracle_adj_mat)
-        SHD = get_SHD(oracle_CPDAG_adj_mat, estim_adj_mat)
+        estim_CPDAG_adj_mat = DAG_to_CPDAG(estim_adj_mat)
+        SHD = get_SHD(oracle_CPDAG_adj_mat, estim_CPDAG_adj_mat)
+
+        adj_accuracies.append(adj_accuracy)
+        adj_precisions.append(adj_precision)
+        adj_recalls.append(adj_recall)
+        adj_f1s.append(adj_f1)
+
+        arr_accuracies.append(arr_accuracy)
+        arr_precisions.append(arr_precision)
+        arr_recalls.append(arr_recall)
+        arr_f1s.append(arr_f1)
 
         SHDs.append(SHD)
         CI_numbers.append(ci_number)
         Times.append(time_lapsed)
 
-        total_SHD += SHD
-        total_ci_number += ci_number
-        total_time += time_lapsed
+        # total_SHD += SHD
+        # total_ci_number += ci_number
+        # total_time += time_lapsed
 
-    commonDivisor = filenumber
+    # commonDivisor = filenumber
+    list_of_columns = [adj_accuracies, adj_precisions, adj_recalls, adj_f1s, arr_accuracies, arr_precisions, arr_recalls, arr_f1s, SHDs, CI_numbers, Times]
+    for col in list_of_columns:
+        col = np.array(col)
 
-    SHDs = np.array(SHD)
-    CI_numbers = np.array(CI_numbers)
-    Times = np.array(Times)
+    adj_accuracies_mean, adj_accuracies_std = np.mean(adj_accuracies), np.std(adj_accuracies)
+    adj_f1s_mean, adj_f1s_std = np.mean(adj_f1s), np.std(adj_f1s)
+    adj_precisions_mean, adj_precisions_std = np.mean(adj_precisions), np.std(adj_precisions)
+    adj_recalls_mean, adj_recalls_std = np.mean(adj_recalls), np.std(adj_recalls)
 
-    SHDs_std = np.std(SHDs)
-    CI_numbers_std = np.std(CI_numbers)
-    Times_std = np.std(Times)
+    arr_accuracies_mean, arr_accuracies_std = np.mean(arr_accuracies), np.std(arr_accuracies)
+    arr_f1s_mean, arr_f1s_std = np.mean(arr_f1s), np.std(arr_f1s)
+    arr_precisions_mean, arr_precisions_std = np.mean(arr_precisions), np.std(arr_precisions)
+    arr_recalls_mean, arr_recalls_std = np.mean(arr_recalls), np.std(arr_recalls)
 
-    return total_SHD / commonDivisor, total_ci_number / commonDivisor, total_time / commonDivisor, \
-        SHDs_std, CI_numbers_std, Times_std
+    SHDs_mean, SHDs_std = np.mean(SHDs), np.std(SHDs)
+    CI_numbers_mean, CI_numbers_std = np.mean(CI_numbers), np.std(CI_numbers)
+    Times_mean, Times_std = np.mean(Times), np.std(Times)
 
+    return adj_accuracies_mean, adj_f1s_mean, adj_precisions_mean, adj_recalls_mean, \
+            arr_accuracies_mean, arr_f1s_mean, arr_precisions_mean, arr_recalls_mean, \
+            SHDs_mean, CI_numbers_mean, Times_mean, \
+            adj_accuracies_std, adj_f1s_std, adj_precisions_std, adj_recalls_std, \
+            arr_accuracies_std, arr_f1s_std, arr_precisions_std, arr_recalls_std, \
+            SHDs_std, CI_numbers_std, Times_std
 
 def get_adj_dict(real_graph_path):
     adj_dict = collections.defaultdict(list)

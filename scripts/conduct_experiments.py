@@ -21,18 +21,19 @@ if __name__ == '__main__':
     Path(results_dir).mkdir(parents=True, exist_ok=True)
 
     if EXPERIMENTAL_RUN:
-        # BNs = ['Linear_10_20']
+        # BNs = ['Nonlinear_20_40']
         # CITs = ['KCI']
 
-        # BNs = ['ER_10_12', 'alarm']
-        # CITs = ['G2', 'G2']
+        # BNs = ['sachs']
+        # CITs = ['G2']
 
-        BNs = ['ER_20_24', 'ER_20_30', 'ER_20_40', 'alarm', 'insurance', 'sachs']
+        BNs = ['alarm', 'insurance', 'sachs']
         CITs = ['G2'] * len(BNs)
-        # nums_vars = (20,)
+        nums_vars = (20,)
         # edge_ratios = (1.2, 1.5, 2)
+        # dataset_sizes = (200, 500, 1000)
         dataset_sizes = (200, 500, 1000)
-        num_sampling = 30
+        num_sampling = 10
 
     else:
         # full experimentation
@@ -44,11 +45,13 @@ if __name__ == '__main__':
         dataset_sizes = (200, 500, 1000, 2000)
         num_sampling = 30
 
+    n_jobs = 1
+    # n_jobs = mp.cpu_count()
     # Parallel(n_jobs=mp.cpu_count())(delayed(cond_experiment)(BN, WORKING_DIR, dataset_sizes, num_sampling) for BN in BNs)
     # Parallel(n_jobs=mp.cpu_count())(delayed(pc_experiment)(BN, WORKING_DIR, dataset_sizes, num_sampling) for BN in BNs)
     # Parallel(n_jobs=mp.cpu_count())(delayed(pc_stable_experiment)(BN, WORKING_DIR, dataset_sizes, num_sampling) for BN in BNs)
     # Parallel(n_jobs=mp.cpu_count())(delayed(new_fn_experiment)(BN, WORKING_DIR, dataset_sizes, num_sampling) for BN in BNs)
-    Parallel(n_jobs=mp.cpu_count())(
+    Parallel(n_jobs=n_jobs)(
         itertools.chain(
             #(delayed(cond_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
             #(delayed(pc_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
