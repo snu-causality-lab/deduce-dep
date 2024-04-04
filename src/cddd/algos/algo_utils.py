@@ -1,4 +1,4 @@
-from itertools import combinations
+from itertools import combinations, product
 
 import networkx as nx
 
@@ -135,10 +135,30 @@ def apply_meeks_rule(dag: nx.DiGraph):
                         break
 
                 # Rule 4: Orient i-j into i->j whenever there are two chains
-                # i-k->l and k->l->j such that k and j are nonadjacent.
-                #
-                # However, this rule is not necessary when the PC-algorithm
-                # is used to estimate a DAG.
+                # i-k->l and k->l->j such that k and j are nonadjacent and i and l are adjacent.
+
+                if is_undirected(dag, i, j):
+                    # Find nodes k where i-k.
+                    adj_i = set()
+                    for k in dag.successors(i):
+                        if dag.has_edge(k, i):
+                            adj_i.add(k)
+
+                    # Find nodes l where l->j
+                    pa_j = set()
+                    for l in dag.predecessors(j):
+                        if not dag.has_edge(j, l):
+                            pa_j.add(l)
+
+                    # For all pairs of (k, l),
+                    for k, l in product(adj_i, pa_j):
+                        # Check k -> l
+                        if dag.has_edge(k, l) and not dag.has_edge(l, k):
+                            # check adjacency between i and l & non-adjacency between k and j
+                            if is_adjacent(dag, i, l) and not is_adjacent(dag, k, j):
+                                dag.remove_edge(j, i)
+                                changed = True
+                                break
 
         # if nx.is_isomorphic(dag, old_dag):
         #     break
