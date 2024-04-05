@@ -24,20 +24,17 @@ if __name__ == '__main__':
         # BNs = ['Nonlinear_20_40']
         # CITs = ['KCI']
 
-        # BNs = ['sachs']
-        # CITs = ['G2']
-
-        BNs = ['alarm', 'insurance', 'sachs']
-        CITs = ['G2'] * len(BNs)
+        BNs = ['Linear_20_30', 'Linear_20_40','Nonlinear_20_30', 'Nonlinear_20_40', 'alarm', 'sachs', 'insurance']
+        CITs = ['ParCorr'] * 2 + ['KCI'] * 2 + ['G2'] * 3
         nums_vars = (20,)
         # edge_ratios = (1.2, 1.5, 2)
         # dataset_sizes = (200, 500, 1000)
         dataset_sizes = (200, 500, 1000)
-        num_sampling = 30
+        num_sampling = 5
 
     else:
         # full experimentation
-        BNs = ['ER_10_12', 'ER_10_15', 'ER_10_20', 'ER_20_24', 'ER_20_30', 'ER_20_40', 'ER_30_36', 'ER_30_45', 'ER_30_60',
+        BNs = ['ER_10_12', 'ER_10_15', 'ER_10_20', 'ER_20_24', 'ER_20_30', 'ER_20_40', 'ER_30_36', 'ERcd_30_45', 'ER_30_60',
                'alarm', 'insurance', 'sachs', 'asia', 'child', 'water']
         CITs = ['G2'] * len(BNs)
         nums_vars = (10, 20, 30)
@@ -45,8 +42,8 @@ if __name__ == '__main__':
         dataset_sizes = (200, 500, 1000, 2000)
         num_sampling = 30
 
-    n_jobs = 1
-    # n_jobs = mp.cpu_count()
+    # n_jobs = 1
+    n_jobs = mp.cpu_count()
     # Parallel(n_jobs=mp.cpu_count())(delayed(cond_experiment)(BN, WORKING_DIR, dataset_sizes, num_sampling) for BN in BNs)
     # Parallel(n_jobs=mp.cpu_count())(delayed(pc_experiment)(BN, WORKING_DIR, dataset_sizes, num_sampling) for BN in BNs)
     # Parallel(n_jobs=mp.cpu_count())(delayed(pc_stable_experiment)(BN, WORKING_DIR, dataset_sizes, num_sampling) for BN in BNs)

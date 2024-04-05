@@ -8,10 +8,10 @@ def estimate_cpdag(skel_graph, sep_set):
     returned by the estimate_skeleton() function.
 
     Args:
-        skel_graph: A skeleton graph (an undirected networkx.Graph).
-        sep_set: An 2D-array of separation set.
+        skel_graph: A skeleton graph (a directed networkx.Graph).
+        sep_set: An dictionary of separation set.
             The contents look like something like below.
-                sep_set[i][j] = set([k, l, m])
+                sep_set[(i, j)] = set([k, l, m])
 
     Returns:
         An estimated DAG.
@@ -19,19 +19,19 @@ def estimate_cpdag(skel_graph, sep_set):
     # dag = skel_graph.to_directed()
     dag = skel_graph
     node_ids = skel_graph.nodes()
+
     for (i, j) in combinations(node_ids, 2):
         adj_i = set(dag.successors(i))
         if j in adj_i:
             continue
+
         adj_j = set(dag.successors(j))
         if i in adj_j:
             continue
-        # if sep_set[i][j] is None:
-        if not sep_set[tuple(sorted([i, j]))]:
-            continue
+
         common_k = adj_i & adj_j
         for k in common_k:
-            if k not in sep_set[tuple(sorted([i, j]))]:
+            if (tuple(sorted([i, j])) in sep_set) and (k not in sep_set[tuple(sorted([i, j]))]):
                 if dag.has_edge(k, i):
                     # _logger.debug('S: remove edge (%s, %s)' % (k, i))
                     dag.remove_edge(k, i)

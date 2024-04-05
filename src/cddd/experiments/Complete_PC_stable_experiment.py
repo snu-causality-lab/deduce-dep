@@ -14,12 +14,11 @@ def complete_pc_stable_experiment(BN, ci_tester_name, working_dir, dataset_sizes
     ci_tester = ci_test_factory(ci_tester_name)
     Ks = [0, 1, 2]
     Alphas = [0.05, 0.01]
+
     COLUMNS = ['BN', 'size_of_sampled_dataset', 'reliability_criterion',
                'adj_accuracy', 'adj_f1', 'adj_precision', 'adj_recall',
-               'arr_accuracy', 'arr_f1', 'arr_precision', 'arr_recall',
                'SHD', 'CI_number', 'Time',
                'adj_accuracy_std', 'adj_f1_std', 'adj_precision_std', 'adj_recall_std',
-               'arr_accuracy_std', 'arr_f1_std', 'arr_precision_std', 'arr_recall_std',
                'SHD_std', 'CI_number_std', 'Time_std']
 
     for K, alpha in product(Ks, Alphas):

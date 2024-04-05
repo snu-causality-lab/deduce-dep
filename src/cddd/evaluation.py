@@ -134,10 +134,10 @@ def global_orientation_metric_evaluation(true_adj_mat, estim_adj_mat):
         if truth_var1_var2 and truth_var2_var1:
             true_endpoint_var1 = 3
             true_endpoint_var2 = 3
-        elif truth_var1_var2 and not truth_var2_var1:
+        elif (truth_var1_var2) and (not truth_var2_var1):
             true_endpoint_var1 = 1
             true_endpoint_var2 = 2
-        elif not truth_var1_var2 and truth_var2_var1:
+        elif (not truth_var1_var2) and (truth_var2_var1):
             true_endpoint_var1 = 2
             true_endpoint_var2 = 1
         else:
@@ -150,10 +150,12 @@ def global_orientation_metric_evaluation(true_adj_mat, estim_adj_mat):
         if estim_var1_var2 and estim_var2_var1:
             estim_endpoint_var1 = 3
             estim_endpoint_var2 = 3
-        elif estim_var1_var2 and not estim_var2_var1:
+        elif (estim_var1_var2) and (not estim_var2_var1):
+            #print("estim!")
             estim_endpoint_var1 = 1
             estim_endpoint_var2 = 2
-        elif not estim_var1_var2 and estim_var2_var1:
+        elif (not estim_var1_var2) and (estim_var2_var1):
+            #print("estim!")
             estim_endpoint_var1 = 2
             estim_endpoint_var2 = 1
         else:
@@ -163,9 +165,9 @@ def global_orientation_metric_evaluation(true_adj_mat, estim_adj_mat):
         # check var1 endpoint
         if true_endpoint_var1 == 2 and estim_endpoint_var1 == 2:
             TP += 1
-        elif not true_endpoint_var1 == 2 and estim_endpoint_var1 == 2:
+        elif (not true_endpoint_var1 == 2) and (estim_endpoint_var1 == 2):
             FP += 1
-        elif true_endpoint_var1 == 2 and not estim_endpoint_var1 == 2:
+        elif (true_endpoint_var1 == 2) and (not estim_endpoint_var1 == 2):
             FN += 1
         else:
             TN += 1
@@ -173,9 +175,9 @@ def global_orientation_metric_evaluation(true_adj_mat, estim_adj_mat):
         # check var2 endpoint
         if true_endpoint_var2 == 2 and estim_endpoint_var2 == 2:
             TP += 1
-        elif not true_endpoint_var2 == 2 and estim_endpoint_var2 == 2:
+        elif (not true_endpoint_var2 == 2) and (estim_endpoint_var2 == 2):
             FP += 1
-        elif true_endpoint_var2 == 2 and not estim_endpoint_var2 == 2:
+        elif (true_endpoint_var2 == 2) and (not estim_endpoint_var2 == 2):
             FN += 1
         else:
             TN += 1
@@ -412,20 +414,15 @@ def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, relia
 
 def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic', K=1, ci_tester=None):
     # pre_set variables are zero
-
-    # total_SHD = 0
-    # total_ci_number = 0
-    # total_time = 0
-
     adj_accuracies = []
     adj_f1s = []
     adj_precisions = []
     adj_recalls = []
 
-    arr_accuracies = []
-    arr_f1s = []
-    arr_precisions = []
-    arr_recalls = []
+    # arr_accuracies = []
+    # arr_f1s = []
+    # arr_precisions = []
+    # arr_recalls = []
 
     SHDs = []
     CI_numbers = []
@@ -451,7 +448,7 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         time_lapsed = end_time - start_time
 
         adj_accuracy, adj_precision, adj_recall, adj_f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
-        arr_accuracy, arr_precision, arr_recall, arr_f1 = global_orientation_metric_evaluation(oracle_adj_mat, estim_adj_mat)
+        # arr_accuracy, arr_precision, arr_recall, arr_f1 = global_orientation_metric_evaluation(oracle_adj_mat, estim_adj_mat)
 
         oracle_CPDAG_adj_mat = DAG_to_CPDAG(oracle_adj_mat)
         estim_CPDAG_adj_mat = DAG_to_CPDAG(estim_adj_mat)
@@ -462,21 +459,17 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         adj_recalls.append(adj_recall)
         adj_f1s.append(adj_f1)
 
-        arr_accuracies.append(arr_accuracy)
-        arr_precisions.append(arr_precision)
-        arr_recalls.append(arr_recall)
-        arr_f1s.append(arr_f1)
+        # arr_accuracies.append(arr_accuracy)
+        # arr_precisions.append(arr_precision)
+        # arr_recalls.append(arr_recall)
+        # arr_f1s.append(arr_f1)
 
         SHDs.append(SHD)
         CI_numbers.append(ci_number)
         Times.append(time_lapsed)
 
-        # total_SHD += SHD
-        # total_ci_number += ci_number
-        # total_time += time_lapsed
-
-    # commonDivisor = filenumber
-    list_of_columns = [adj_accuracies, adj_precisions, adj_recalls, adj_f1s, arr_accuracies, arr_precisions, arr_recalls, arr_f1s, SHDs, CI_numbers, Times]
+    # list_of_columns = [adj_accuracies, adj_precisions, adj_recalls, adj_f1s, arr_accuracies, arr_precisions, arr_recalls, arr_f1s, SHDs, CI_numbers, Times]
+    list_of_columns = [adj_accuracies, adj_precisions, adj_recalls, adj_f1s, SHDs, CI_numbers, Times]
     for col in list_of_columns:
         col = np.array(col)
 
@@ -485,21 +478,26 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
     adj_precisions_mean, adj_precisions_std = np.mean(adj_precisions), np.std(adj_precisions)
     adj_recalls_mean, adj_recalls_std = np.mean(adj_recalls), np.std(adj_recalls)
 
-    arr_accuracies_mean, arr_accuracies_std = np.mean(arr_accuracies), np.std(arr_accuracies)
-    arr_f1s_mean, arr_f1s_std = np.mean(arr_f1s), np.std(arr_f1s)
-    arr_precisions_mean, arr_precisions_std = np.mean(arr_precisions), np.std(arr_precisions)
-    arr_recalls_mean, arr_recalls_std = np.mean(arr_recalls), np.std(arr_recalls)
+    # arr_accuracies_mean, arr_accuracies_std = np.mean(arr_accuracies), np.std(arr_accuracies)
+    # arr_f1s_mean, arr_f1s_std = np.mean(arr_f1s), np.std(arr_f1s)
+    # arr_precisions_mean, arr_precisions_std = np.mean(arr_precisions), np.std(arr_precisions)
+    # arr_recalls_mean, arr_recalls_std = np.mean(arr_recalls), np.std(arr_recalls)
 
     SHDs_mean, SHDs_std = np.mean(SHDs), np.std(SHDs)
     CI_numbers_mean, CI_numbers_std = np.mean(CI_numbers), np.std(CI_numbers)
     Times_mean, Times_std = np.mean(Times), np.std(Times)
 
+    # return adj_accuracies_mean, adj_f1s_mean, adj_precisions_mean, adj_recalls_mean, \
+    #         arr_accuracies_mean, arr_f1s_mean, arr_precisions_mean, arr_recalls_mean, \
+    #         SHDs_mean, CI_numbers_mean, Times_mean, \
+    #         adj_accuracies_std, adj_f1s_std, adj_precisions_std, adj_recalls_std, \
+    #         arr_accuracies_std, arr_f1s_std, arr_precisions_std, arr_recalls_std, \
+    #         SHDs_std, CI_numbers_std, Times_std
+
     return adj_accuracies_mean, adj_f1s_mean, adj_precisions_mean, adj_recalls_mean, \
-            arr_accuracies_mean, arr_f1s_mean, arr_precisions_mean, arr_recalls_mean, \
-            SHDs_mean, CI_numbers_mean, Times_mean, \
-            adj_accuracies_std, adj_f1s_std, adj_precisions_std, adj_recalls_std, \
-            arr_accuracies_std, arr_f1s_std, arr_precisions_std, arr_recalls_std, \
-            SHDs_std, CI_numbers_std, Times_std
+        SHDs_mean, CI_numbers_mean, Times_mean, \
+        adj_accuracies_std, adj_f1s_std, adj_precisions_std, adj_recalls_std, \
+        SHDs_std, CI_numbers_std, Times_std
 
 def get_adj_dict(real_graph_path):
     adj_dict = collections.defaultdict(list)

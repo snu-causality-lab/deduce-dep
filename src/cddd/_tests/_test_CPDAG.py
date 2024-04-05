@@ -12,11 +12,18 @@ if __name__ == '__main__':
     true_dag = np.zeros((3, 3), dtype=int)
     true_dag[0, 1] = 1
     true_dag[2, 1] = 1
-    true_G = pd.DataFrame(true_dag, columns = [i for i in range(3)], dtype = int)
-    true_G = nx.DiGraph(true_G)
-    sepset = {(0, 2) : ()}
 
-    estim_dag = estimate_cpdag(true_G, sepset)
+    estim_dag = np.zeros((3,3), dtype =int)
+    estim_dag[0, 1] = 1
+    estim_dag[1, 0] = 1
+    estim_dag[2, 1] = 1
+    estim_dag[1, 2] = 1
+
+    estim_G = pd.DataFrame(estim_dag, columns=[i for i in range(3)], dtype=int)
+    estim_G = nx.DiGraph(estim_G)
+    sepset = {(0, 2): ()}
+
+    estim_dag = estimate_cpdag(estim_G, sepset)
     estim_dag = nx.to_numpy_array(estim_dag)
 
     assert np.all(true_dag == estim_dag) == True
