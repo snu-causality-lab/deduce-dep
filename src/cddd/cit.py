@@ -16,8 +16,6 @@ import warnings
 from typing import Tuple
 
 import numpy as np
-import pandas as pd
-import statsmodels.formula.api as sm
 import statsmodels.api as sm2
 from causallearn.utils.cit import CIT
 from scipy.stats import chi2
@@ -196,7 +194,7 @@ def cond_indep_test(data, X, Y, cond_set=None, is_discrete=True):
 
 
 class CITester:
-    def __init__(self):
+    def __init__(self, **kwargs):
         ...
 
     def ci_test(self, data, X, Y, cond_set=frozenset()) -> Tuple[float, float]:
@@ -205,54 +203,103 @@ class CITester:
 
 
 class G2Tester(CITester):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.data = None, None, None
+        if 'data' in kwargs:
+            self.data = kwargs['data']
+        self.cache = dict()
 
     def ci_test(self, data, X, Y, cond_set=frozenset()):
-        pval, dep = g2_test_dis(data, X, Y, cond_set)
-        return pval, dep
+        if data is not None and data is not self.data:
+            pval, dep = g2_test_dis(data, X, Y, cond_set)
+            return pval, dep
+        return self.cached_ci_test(tuple(sorted([X, Y])), frozenset(cond_set))
+
+    def cached_ci_test(self, XY, cond_set=frozenset()):
+        if (XY, cond_set) in self.cache:
+            return self.cache[(XY, cond_set)]
+        X, Y = XY
+        pval, dep = g2_test_dis(self.data, X, Y, cond_set)
+
+        self.cache[(XY, cond_set)] = (pval, dep)
+        return self.cache[(XY, cond_set)]
 
 
 class PartialCorrelation(CITester):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.data = None, None, None
+        if 'data' in kwargs:
+            self.data = kwargs['data']
+        self.cache = dict()
 
     def ci_test(self, data, X, Y, cond_set=frozenset()):
-        # X, Y = str(X), str(Y)
-        # Zs = ''.join([f' + {_}' for _ in cond_set])
-        # X = df_adv[['TV', 'Radio']] y = df_adv['Sales']
-        # X = sm.add_constant(X)
-        # result = sm.ols(formula= f"{X} ~ {Y} {Zs}", data=data).fit()
+        if data is not None and data is not self.data:
+            result = sm2.OLS(data[X], sm2.add_constant(data[[Y] + list(cond_set)])).fit()
+            p_values = result.summary2().tables[1]['P>|t|']
+            pval = p_values[Y]
+            # Note that X and Y are symmetric
+            return pval, -pval
+        return self.cached_ci_test(tuple(sorted([X, Y])), frozenset(cond_set))
 
-        result = sm2.OLS(data[X], sm2.add_constant(data[[Y] + list(cond_set)])).fit()
+    def cached_ci_test(self, XY, cond_set=frozenset()):
+        if (XY, cond_set) in self.cache:
+            # print(f'hit {XY}, {cond_set}')
+            return self.cache[(XY, cond_set)]
+        X, Y = XY
 
+        result = sm2.OLS(self.data[X], sm2.add_constant(self.data[[Y] + list(cond_set)])).fit()
         p_values = result.summary2().tables[1]['P>|t|']
         pval = p_values[Y]
-        # Note that X and Y are symmetric
-        return pval, -pval
+
+        self.cache[(XY, cond_set)] = (pval, -pval)
+        return self.cache[(XY, cond_set)]
 
 
 class KernelCITest(CITester):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.data, self.kci_obj, self.idx = None, None, None
+        if 'data' in kwargs:
+            self.data = kwargs['data']
+            data_matrix = self.data.to_numpy()
+            self.idx = {col: i for i, col in enumerate(self.data.columns)}
+            self.kci_obj = CIT(data_matrix, "kci",
+                               KernelX='GaussianKernel',
+                               KernelY='GaussianKernel',
+                               KernelZ='GaussianKernel', approx=False, est_width='median')
+        self.cache = dict()
 
     def ci_test(self, data, X, Y, cond_set=frozenset()):
-        data_matrix = data.to_numpy()
-        idx = {col: i for i, col in enumerate(data.columns)}
-        kci_obj = CIT(data_matrix, "kci",
-                      KernelX='GaussianKernel',
-                      KernelY='GaussianKernel',
-                      KernelZ='GaussianKernel', approx=False, est_width='median')
-        pval = kci_obj([idx[X]], [idx[Y]], [idx[z] for z in cond_set])
-        return pval, -pval
+        if data is not None and data is not self.data:
+            data_matrix = data.to_numpy()
+            idx = {col: i for i, col in enumerate(data.columns)}
+            kci_obj = CIT(data_matrix, "kci",
+                          KernelX='GaussianKernel',
+                          KernelY='GaussianKernel',
+                          KernelZ='GaussianKernel', approx=False, est_width='median')
+            pval = kci_obj([idx[X]], [idx[Y]], [idx[z] for z in cond_set])
+            return pval, -pval
+
+        return self.cached_ci_test(tuple(sorted([X, Y])), frozenset(cond_set))
+
+    def cached_ci_test(self, XY, cond_set=frozenset()):
+        if (XY, cond_set) in self.cache:
+            return self.cache[(XY, cond_set)]
+        X, Y = XY
+        pval = self.kci_obj([self.idx[X]], [self.idx[Y]], [self.idx[z] for z in cond_set])
+
+        self.cache[(XY, cond_set)] = (pval, -pval)
+        return self.cache[(XY, cond_set)]
 
 
-def ci_test_factory(name):
+def ci_test_factory(name, **kwargs):
     if name == 'G2':
-        return G2Tester()
+        return G2Tester(**kwargs)
     elif name == 'ParCorr':
-        return PartialCorrelation()
+        return PartialCorrelation(**kwargs)
     elif name == 'KCI':
-        return KernelCITest()
+        return KernelCITest(**kwargs)
     else:
         raise AssertionError(f'unknown CI tester: {name}')

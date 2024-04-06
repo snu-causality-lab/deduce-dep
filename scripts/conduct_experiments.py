@@ -1,23 +1,21 @@
-import itertools
 import multiprocessing as mp
 from pathlib import Path
 
-from joblib import Parallel, delayed
-
-from cddd.experiments.PC_stable_experiment import pc_stable_experiment
+from cddd.experiments.cached_PC_stable_experiment import cached_pc_stable_experiment
 
 if __name__ == '__main__':
     ############# just for checking working! #####################
     EXPERIMENTAL_RUN = True
 
-    WORKING_DIR = '/home/jonghwan/CDDD'
+    # WORKING_DIR = '/home/jonghwan/CDDD'
     # WORKING_DIR = '/Users/gimjonghwan/Desktop/CD_DD'
-    # WORKING_DIR = '/Users/sanghacklee/Dropbox/python_projs/CD_DD'
+    WORKING_DIR = '/Users/sanghacklee/Dropbox/python_projs/CD_DD'
     results_dir = f'{WORKING_DIR}/results'
     Path(results_dir).mkdir(parents=True, exist_ok=True)
 
     if EXPERIMENTAL_RUN:
         BNs = ['Linear_20_36', 'Linear_20_64', 'Linear_20_36_sf', 'Linear_20_64_sf']
+        BNs = ['Linear_20_36']
         # BNs = ['Linear_20_36']
         CITs = ['ParCorr'] * len(BNs)
 
@@ -26,10 +24,17 @@ if __name__ == '__main__':
         # nums_vars = (20,)
         # edge_ratios = (1.2, 1.5, 2)
         # dataset_sizes = (200, 500, 1000)
-        Ks = [0, 1, 2]
-        Alphas = [0.05, 0.01]
-        dataset_sizes = (30, 50, 100, 150)
-        num_sampling = 10
+        # Ks = [0, 1, 2]
+        # Alphas = [0.05, 0.01]
+        # dataset_sizes = (30, 50, 100, 150)
+        # num_sampling = 10
+        # reliability_criterions = ['no', 'deductive_reasoning']
+
+        Ks = [0, ]
+        Alphas = [0.05, ]
+        dataset_sizes = (30,)
+        num_sampling = 2
+        reliability_criterions = ['no', 'deductive_reasoning']
 
     else:
         # full experimentation
@@ -47,13 +52,15 @@ if __name__ == '__main__':
     # Parallel(n_jobs=mp.cpu_count())(delayed(pc_experiment)(BN, WORKING_DIR, dataset_sizes, num_sampling) for BN in BNs)
     # Parallel(n_jobs=mp.cpu_count())(delayed(pc_stable_experiment)(BN, WORKING_DIR, dataset_sizes, num_sampling) for BN in BNs)
     # Parallel(n_jobs=mp.cpu_count())(delayed(new_fn_experiment)(BN, WORKING_DIR, dataset_sizes, num_sampling) for BN in BNs)
-    Parallel(n_jobs=n_jobs)(
-        itertools.chain(
-            # (delayed(cond_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
-            # (delayed(pc_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
-            (delayed(pc_stable_experiment)(BN, cit, WORKING_DIR, size_of_sampled_dataset, num_sampling, K, Alpha) for (BN, cit), K, Alpha, size_of_sampled_dataset in itertools.product(list(zip(BNs, CITs)), Ks, Alphas, dataset_sizes)),
-            # (delayed(complete_pc_stable_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
-            # (delayed(new_fn_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs))
-        )
-    )
+    # Parallel(n_jobs=n_jobs)(
+    #     itertools.chain(
+    #         # (delayed(cond_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
+    #         # (delayed(pc_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
+    #         (delayed(pc_stable_experiment)(BN, cit, WORKING_DIR, size_of_sampled_dataset, num_sampling, K, Alpha) for (BN, cit), K, Alpha, size_of_sampled_dataset in itertools.product(list(zip(BNs, CITs)), Ks, Alphas, dataset_sizes)),
+    #         # (delayed(complete_pc_stable_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs)),
+    #         # (delayed(new_fn_experiment)(BN, cit, WORKING_DIR, dataset_sizes, num_sampling) for BN, cit in zip(BNs, CITs))
+    #     )
+    # )
+    cached_pc_stable_experiment(WORKING_DIR, BNs, CITs, Ks, Alphas, dataset_sizes, num_sampling, reliability_criterions, n_jobs=n_jobs)
+
     # fn_experiment(WORKING_DIR, nums_vars, edge_ratios, dataset_sizes)

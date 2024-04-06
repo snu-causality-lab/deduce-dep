@@ -1,5 +1,6 @@
 import collections
 import time
+from itertools import combinations
 
 import networkx as nx
 import numpy as np
@@ -12,7 +13,6 @@ from cddd.algos.PC_STABLE import pc_stable
 from cddd.algos.PC_STABLE_with_CI_ORACLE import pc_stable_oracle
 from cddd.algos.PC_with_CI_ORACLE import pc_oracle
 from cddd.correction import correction
-from itertools import combinations
 
 
 #
@@ -116,6 +116,7 @@ def global_skeleton_metric_evaluation(true_adj_mat, estim_adj_mat):
 
     return accuracy, precision, recall, f1
 
+
 def global_orientation_metric_evaluation(true_adj_mat, estim_adj_mat):
     num_vars = len(true_adj_mat[0])
     node_list = [i for i in range(num_vars)]
@@ -151,11 +152,11 @@ def global_orientation_metric_evaluation(true_adj_mat, estim_adj_mat):
             estim_endpoint_var1 = 3
             estim_endpoint_var2 = 3
         elif (estim_var1_var2) and (not estim_var2_var1):
-            #print("estim!")
+            # print("estim!")
             estim_endpoint_var1 = 1
             estim_endpoint_var2 = 2
         elif (not estim_var1_var2) and (estim_var2_var1):
-            #print("estim!")
+            # print("estim!")
             estim_endpoint_var1 = 2
             estim_endpoint_var2 = 1
         else:
@@ -189,6 +190,7 @@ def global_orientation_metric_evaluation(true_adj_mat, estim_adj_mat):
 
     return accuracy, precision, recall, f1
 
+
 def DAG_to_CPDAG(adj_mat):
     GT = nx.DiGraph(adj_mat)
     nodes = list(GT.nodes)
@@ -204,6 +206,7 @@ def DAG_to_CPDAG(adj_mat):
                 adj_mat[child][b] = 0
     return adj_mat
 
+
 def get_SHD(oracle_adj_mat, estim_adj_mat):
     # DAG -> CPDAG
 
@@ -211,6 +214,7 @@ def get_SHD(oracle_adj_mat, estim_adj_mat):
     diff = diff + diff.transpose()
     diff[diff > 1] = 1
     return np.sum(diff) / 2
+
 
 def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, filenumber=10, alaph=0.01, reliability_criterion='classic', K=1, ci_tester=None):
     # pre_set variables are zero
@@ -361,12 +365,10 @@ def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, relia
     CI_numbers = []
     Times = []
 
-    examplePath = path + str(1) + ".csv"
-    data = pd.read_csv(examplePath)
-    number, all_number_Para = np.shape(data)
+    _, all_number_Para = np.shape(data := pd.read_csv(examplePath := path + str(1) + ".csv"))
 
-    true_adj_mat = get_adj_mat(all_number_Para, real_graph_path)
-    true_graph = nx.DiGraph(true_adj_mat)
+    true_graph = nx.DiGraph(true_adj_mat := get_adj_mat(all_number_Para, real_graph_path))
+    # TODO (replace) just adjacency matrix for skeleton,
     oracle_adj_mat = pc_stable_oracle(true_adj_mat, true_graph)
 
     for m in range(filenumber):
@@ -434,7 +436,7 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
 
     true_adj_mat = get_adj_mat(all_number_Para, real_graph_path)
     true_graph = nx.DiGraph(true_adj_mat)
-    oracle_adj_mat = pc_stable_oracle(true_adj_mat, true_graph, is_orientation = True)
+    oracle_adj_mat = pc_stable_oracle(true_adj_mat, true_graph, is_orientation=True)
 
     for m in range(filenumber):
         completePath = path + str(m + 1) + ".csv"
@@ -443,7 +445,7 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         data.columns = [i for i in range(kVar)]
 
         start_time = time.time()
-        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion, is_orientation = True, K = K, ci_tester=ci_tester)
+        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion, is_orientation=True, K=K, ci_tester=ci_tester)
         end_time = time.time()
         time_lapsed = end_time - start_time
 
@@ -498,6 +500,7 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         SHDs_mean, CI_numbers_mean, Times_mean, \
         adj_accuracies_std, adj_f1s_std, adj_precisions_std, adj_recalls_std, \
         SHDs_std, CI_numbers_std, Times_std
+
 
 def get_adj_dict(real_graph_path):
     adj_dict = collections.defaultdict(list)
