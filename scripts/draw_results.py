@@ -230,6 +230,8 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
                 if len(df_crit) == 0:
                     continue
 
+                df_crit = df_crit.sort_values(['size_of_sampled_dataset'])
+
                 x = df_crit['size_of_sampled_dataset']
                 y = df_crit[metric]
 
@@ -295,7 +297,7 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
 
 
 if __name__ == '__main__':
-    WORKING_DIR = '/Users/johndoe/CD_DD'
+    WORKING_DIR = '/home/johndoe/CD_DD'
     results_dir = f'{WORKING_DIR}/results'
 
     # draw for performance
@@ -303,7 +305,7 @@ if __name__ == '__main__':
     for K in [0, 1, 2]:
         create_all_algo(results_dir, K)
         # TODO previous version used 10 samples, now 30, please change repeated accordingly (for correct confidence intervals)
-        draw_for_perf_experiments(results_dir, K, repeated=10)
+        draw_for_perf_experiments(results_dir, K, repeated=30)
 
     # draw for correction
     for K in [0, 1, 2]:
