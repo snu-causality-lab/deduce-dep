@@ -26,3 +26,4 @@ def pc_stable_experiment(BN, ci_tester_name, working_dir, size_of_sampled_datase
 
     result_file_path = f'{working_dir}/results/pc_stable_result_{alpha}_{K}.csv'
     safe_save_to_csv(result, COLUMNS, result_file_path)
+    # print(f'pc_stable_experiment {(BN, ci_tester_name, working_dir, size_of_sampled_dataset, sampling_number, K, alpha)}')

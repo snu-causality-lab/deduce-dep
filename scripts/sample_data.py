@@ -240,7 +240,7 @@ if __name__ == '__main__':
 
     # You will see (a lot of ignorable) warnings like
     # [d3blocks] >WARNING> Probability values don't exactly sum to 1. Differ by: -2.220446049250313e-16. Adjusting values.
-    WORKING_DIR = '/home/johndoe/CDDD'
+    WORKING_DIR = '/home/johndoe/CD_DD'
     graph_dir = f'{WORKING_DIR}/data/Ground_truth'
     data_dir = f'{WORKING_DIR}/data/Sampled_datasets'
 
@@ -249,7 +249,6 @@ if __name__ == '__main__':
 
     nums_vars = (10, 20, 30)
     edge_ratios = (1.2, 1.5, 2)
-    edges_to_attach = (2, 4)    # for scale-free networks
     num_sampling = 30
     dataset_sizes = (200, 500, 1000, 2000)
 
@@ -272,7 +271,9 @@ if __name__ == '__main__':
     print('generating previous style random datasets.')  # in the submission
     sample_synthetic_dataset(5, 10, 10, 200, WORKING_DIR, seed=0)
 
-    dataset_sizes = (200, 500, 1000, 2000)
+    edge_ratios = (1.8, 3.2)
+    edges_to_attach = (2, 4)  # for scale-free networks
+    dataset_sizes = (30, 50, 100, 150)
 
     print('generating linear SEM datasets.')  # post-submission : Linear SEM ER
     # generate data from linear SEM

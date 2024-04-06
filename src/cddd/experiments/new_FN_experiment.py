@@ -1,6 +1,5 @@
 import random
 from collections import Counter
-from itertools import product
 
 import networkx as nx
 import numpy as np
@@ -14,41 +13,37 @@ from cddd.sampling import shuffled
 from cddd.utils import safe_save_to_csv
 
 
-def new_fn_experiment(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30):
+def new_fn_experiment(BN, alpha, K, ci_tester_name, working_dir, dataset_size, sample_id):
     # experiments settings
-    Alphas = [0.01, 0.05]
-    Ks = [0, 1, 2]
     random.seed(0)
     ci_tester = ci_test_factory(ci_tester_name)
 
-    for alpha, K in product(Alphas, Ks):
-        # experiment results
-        columns = ['BN', 'data_set_size', 'is_deductive_reasoning',
-                   'Accuracy', 'Precision', 'Recall', 'F1']
-        result = []
+    # experiment results
+    columns = ['BN', 'data_set_size', 'is_deductive_reasoning',
+               'Accuracy', 'Precision', 'Recall', 'F1']
+    result = []
 
-        for size_of_sampled_dataset in dataset_sizes:
-            real_graph_path = f"{working_dir}/data/Ground_truth/{BN}_true.txt"
-            data_path = f"{working_dir}/data/Sampled_datasets/{BN}_{size_of_sampled_dataset}_v"
-            data = pd.read_csv(data_path + '1.csv')
-            number_of_data, num_vars = np.shape(data)
+    real_graph_path = f"{working_dir}/data/Ground_truth/{BN}_true.txt"
+    data_path = f"{working_dir}/data/Sampled_datasets/{BN}_{dataset_size}_v"
+    data = pd.read_csv(data_path + '1.csv')
+    number_of_data, num_vars = np.shape(data)
 
-            true_adj_mat = get_adj_mat(num_vars, real_graph_path)
-            true_graph = nx.DiGraph(true_adj_mat)
+    true_adj_mat = get_adj_mat(num_vars, real_graph_path)
+    true_graph = nx.DiGraph(true_adj_mat)
 
-            for m in range(sampling_number):
-                completePath = data_path + str(m + 1) + ".csv"
-                data = pd.read_csv(completePath)
-                number_of_data, num_vars = np.shape(data)
-                data.columns = [i for i in range(num_vars)]
+    completePath = data_path + str(sample_id) + ".csv"
+    data = pd.read_csv(completePath)
+    number_of_data, num_vars = np.shape(data)
+    data.columns = [i for i in range(num_vars)]
 
-                result_mth = __fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, 20, ci_tester=ci_tester)
+    result_mth = __fn_experiment_core(BN, K, alpha, data, num_vars, dataset_size, true_graph, 20, ci_tester=ci_tester)
 
-                result.extend(result_mth)
+    result.extend(result_mth)
 
-        # write and save the experiment result as a csv file
-        result_file_path = f'{working_dir}/results/new_fn_result_{alpha}_{K}.csv'
-        safe_save_to_csv(result, columns, result_file_path)
+    # write and save the experiment result as a csv file
+    result_file_path = f'{working_dir}/results/new_fn_result_{alpha}_{K}.csv'
+    safe_save_to_csv(result, columns, result_file_path)
+    # print(f'new_fn_experiment {(BN, alpha, K, ci_tester_name, working_dir, dataset_size, sample_id)}')
 
 
 def __fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, n_repeats=20, ci_tester=None):
