@@ -1,10 +1,8 @@
+import networkx as nx
 import numpy as np
 import pandas as pd
-import networkx as nx
 
 from cddd.algos.algo_utils import estimate_cpdag
-
-from cddd.evaluation import get_SHD
 
 if __name__ == '__main__':
     # collider check

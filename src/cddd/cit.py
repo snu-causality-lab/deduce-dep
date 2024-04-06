@@ -39,6 +39,7 @@ def g_square_dis(dm, x, y, s, levels):
     Returns:
         p_val: the p-value of conditional independence.
     """
+    tlog = None
 
     def _calculate_tlog(x, y, s, levels, dm):
         prod_levels = np.prod(list(map(lambda x: levels[x], s)))
@@ -245,7 +246,6 @@ class PartialCorrelation(CITester):
 
     def cached_ci_test(self, XY, cond_set=frozenset()):
         if (XY, cond_set) in self.cache:
-            # print(f'hit {XY}, {cond_set}')
             return self.cache[(XY, cond_set)]
         X, Y = XY
 

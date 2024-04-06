@@ -8,49 +8,9 @@ import pandas as pd
 
 from cddd.algos.HITON_PC import HITON_PC
 from cddd.algos.HITON_PC_with_CI_ORACLE import HITON_PC_oracle
-from cddd.algos.PC import pc
 from cddd.algos.PC_STABLE import pc_stable
 from cddd.algos.PC_STABLE_with_CI_ORACLE import pc_stable_oracle
-from cddd.algos.PC_with_CI_ORACLE import pc_oracle
 from cddd.correction import correction
-
-
-#
-# def realMB(kVar, path):
-#     graph = np.zeros((kVar, kVar))
-#     parents = [[] for _ in range(kVar)]
-#     children = [[] for _ in range(kVar)]
-#     MB = [[] for _ in range(kVar)]
-#     PC = [[] for _ in range(kVar)]
-#     spouses = [[] for _ in range(kVar)]
-#
-#     i = 0
-#     with open(path) as fileobject:
-#         for line in fileobject:
-#             a = line.split(" ")
-#             j = 0
-#             for n in a:
-#                 graph[i, j] = n
-#                 j += 1
-#             i += 1
-#
-#     for m in range(kVar):
-#         parents[m] = [i for i in range(kVar) if graph[i][m] == 1]
-#         children[m] = [i for i in range(kVar) if graph[m][i] == 1]
-#
-#         PC[m] = list(set(parents[m]).union(set(children[m])))
-#
-#     for m in range(kVar):
-#         for child in children[m]:
-#             spouse = parents[int(child)]
-#             spouses[m] = list(set(spouses[m]).union(set(spouse)))
-#         if m in spouses[m]:
-#             spouses[m].remove(m)
-#
-#     for m in range(kVar):
-#         MB[m] = list(set(PC[m]).union(set(spouses[m])))
-#
-#     return MB, PC, graph
 
 
 def local_metric_evaluation(Distance, F1, Precision, Recall, ResPC, realpc, target_list):
@@ -216,7 +176,8 @@ def get_SHD(oracle_adj_mat, estim_adj_mat):
     return np.sum(diff) / 2
 
 
-def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, filenumber=10, alaph=0.01, reliability_criterion='classic', K=1, ci_tester=None):
+def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, filenumber=10, alaph=0.01,
+                    reliability_criterion='classic', K=1, ci_tester=None):
     # pre_set variables are zero
     Precision = 0
     Recall = 0
@@ -250,10 +211,9 @@ def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, f
             Oraclepc = HITON_PC_oracle(data, assoc, target, alaph, true_graph, ci_tester=ci_tester)
             OraclePC[i] = Oraclepc
 
-        sepsets = None
         for i, target in enumerate(target_list):
             start_time = time.time()
-            PC, sepsets, ci_number = HITON_PC(data, assoc, target, alaph, reliability_criterion, K, ci_tester=ci_tester)
+            PC, _, ci_number = HITON_PC(data, assoc, target, alaph, reliability_criterion, K, ci_tester=ci_tester)
             end_time = time.time()
             time_lapsed = end_time - start_time
 
@@ -264,7 +224,8 @@ def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, f
             ResPC[i] = PC
 
         correction(ResPC, rule)
-        Distance, F1, Precision, Recall = local_metric_evaluation(Distance, F1, Precision, Recall, ResPC, OraclePC, target_list)
+        Distance, F1, Precision, Recall = local_metric_evaluation(Distance, F1, Precision, Recall, ResPC, OraclePC,
+                                                                  target_list)
 
         F1s.append(F1 / (length_targets * (m + 1)))
         Precisions.append(Precision / (length_targets * (m + 1)))
@@ -288,7 +249,70 @@ def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, f
         F1s_std, Precisions_std, Recalls_std, CI_numbers_std, Times_std
 
 
-def pc_evaluation(path, real_graph_path, filenumber, alpha, reliability_criterion='classic', ci_tester=None):
+# def pc_evaluation(path, real_graph_path, filenumber, alpha, reliability_criterion='classic', ci_tester=None):
+#     # pre_set variables are zero
+#     Accuracy = 0
+#     Precision = 0
+#     Recall = 0
+#     F1 = 0
+#     total_ci_number = 0
+#     total_time = 0
+#
+#     F1s = []
+#     Precisions = []
+#     Recalls = []
+#     CI_numbers = []
+#     Times = []
+#
+#     true_adj_dict = get_adj_dict(real_graph_path)
+#     true_graph = nx.DiGraph(true_adj_dict)
+#     oracle_adj_mat = pc_oracle(true_adj_dict, true_graph)
+#
+#     for m in range(filenumber):
+#         completePath = path + str(m + 1) + ".csv"
+#         data = pd.read_csv(completePath)
+#         number, kVar = np.shape(data)
+#         data.columns = [i for i in range(kVar)]
+#
+#         start_time = time.time()
+#         estim_adj_mat, sepsets, ci_number = pc(data, alpha, reliability_criterion, ci_tester=ci_tester)
+#         end_time = time.time()
+#         time_lapsed = end_time - start_time
+#         accuracy, precision, recall, f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
+#
+#         F1s.append(f1)
+#         Precisions.append(precision)
+#         Recalls.append(recall)
+#         CI_numbers.append(ci_number)
+#         Times.append(time_lapsed)
+#
+#         total_ci_number += ci_number
+#         total_time += time_lapsed
+#         Accuracy += accuracy
+#         Precision += precision
+#         Recall += recall
+#         F1 += f1
+#
+#     commonDivisor = filenumber
+#
+#     F1s = np.array(F1s)
+#     Precisions = np.array(Precisions)
+#     Recalls = np.array(Recalls)
+#     CI_numbers = np.array(CI_numbers)
+#     Times = np.array(Times)
+#
+#     F1s_std = np.std(F1s)
+#     Precisions_std = np.std(Precisions)
+#     Recalls_std = np.std(Recalls)
+#     CI_numbers_std = np.std(CI_numbers)
+#     Times_std = np.std(Times)
+#
+#     return Accuracy / commonDivisor, Precision / commonDivisor, Recall / commonDivisor, F1 / commonDivisor, total_ci_number / commonDivisor, total_time / commonDivisor, \
+#         Precisions_std, Recalls_std, F1s_std, CI_numbers_std, Times_std
+
+
+def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic', K=1,
+                         ci_tester=None):
     # pre_set variables are zero
     Accuracy = 0
     Precision = 0
@@ -303,69 +327,7 @@ def pc_evaluation(path, real_graph_path, filenumber, alpha, reliability_criterio
     CI_numbers = []
     Times = []
 
-    true_adj_dict = get_adj_dict(real_graph_path)
-    true_graph = nx.DiGraph(true_adj_dict)
-    oracle_adj_mat = pc_oracle(true_adj_dict, true_graph)
-
-    for m in range(filenumber):
-        completePath = path + str(m + 1) + ".csv"
-        data = pd.read_csv(completePath)
-        number, kVar = np.shape(data)
-        data.columns = [i for i in range(kVar)]
-
-        start_time = time.time()
-        estim_adj_mat, sepsets, ci_number = pc(data, alpha, reliability_criterion, ci_tester=ci_tester)
-        end_time = time.time()
-        time_lapsed = end_time - start_time
-        accuracy, precision, recall, f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
-
-        F1s.append(f1)
-        Precisions.append(precision)
-        Recalls.append(recall)
-        CI_numbers.append(ci_number)
-        Times.append(time_lapsed)
-
-        total_ci_number += ci_number
-        total_time += time_lapsed
-        Accuracy += accuracy
-        Precision += precision
-        Recall += recall
-        F1 += f1
-
-    commonDivisor = filenumber
-
-    F1s = np.array(F1s)
-    Precisions = np.array(Precisions)
-    Recalls = np.array(Recalls)
-    CI_numbers = np.array(CI_numbers)
-    Times = np.array(Times)
-
-    F1s_std = np.std(F1s)
-    Precisions_std = np.std(Precisions)
-    Recalls_std = np.std(Recalls)
-    CI_numbers_std = np.std(CI_numbers)
-    Times_std = np.std(Times)
-
-    return Accuracy / commonDivisor, Precision / commonDivisor, Recall / commonDivisor, F1 / commonDivisor, total_ci_number / commonDivisor, total_time / commonDivisor, \
-        Precisions_std, Recalls_std, F1s_std, CI_numbers_std, Times_std
-
-
-def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic', K=1, ci_tester=None):
-    # pre_set variables are zero
-    Accuracy = 0
-    Precision = 0
-    Recall = 0
-    F1 = 0
-    total_ci_number = 0
-    total_time = 0
-
-    F1s = []
-    Precisions = []
-    Recalls = []
-    CI_numbers = []
-    Times = []
-
-    _, all_number_Para = np.shape(data := pd.read_csv(examplePath := path + str(1) + ".csv"))
+    _, all_number_Para = np.shape(pd.read_csv(path + str(1) + ".csv"))
 
     true_graph = nx.DiGraph(true_adj_mat := get_adj_mat(all_number_Para, real_graph_path))
     # TODO (replace) just adjacency matrix for skeleton,
@@ -414,43 +376,31 @@ def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, relia
         Precisions_std, Recalls_std, F1s_std, CI_numbers_std, Times_std
 
 
-def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic', K=1, ci_tester=None):
+def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic',
+                                  K=1, ci_tester=None):
     # pre_set variables are zero
     adj_accuracies = []
     adj_f1s = []
     adj_precisions = []
     adj_recalls = []
 
-    # arr_accuracies = []
-    # arr_f1s = []
-    # arr_precisions = []
-    # arr_recalls = []
-
     SHDs = []
     CI_numbers = []
     Times = []
 
-    examplePath = path + str(1) + ".csv"
-    data = pd.read_csv(examplePath)
-    number, all_number_Para = np.shape(data)
-
-    true_adj_mat = get_adj_mat(all_number_Para, real_graph_path)
-    true_graph = nx.DiGraph(true_adj_mat)
-    oracle_adj_mat = pc_stable_oracle(true_adj_mat, true_graph, is_orientation=True)
+    oracle_adj_mat = get_oracle_adj_mat(path, real_graph_path)
 
     for m in range(filenumber):
-        completePath = path + str(m + 1) + ".csv"
-        data = pd.read_csv(completePath)
-        number, kVar = np.shape(data)
-        data.columns = [i for i in range(kVar)]
+        data = load_data(path, m)
 
         start_time = time.time()
-        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion, is_orientation=True, K=K, ci_tester=ci_tester)
+        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion, is_orientation=True, K=K,
+                                                      ci_tester=ci_tester)
         end_time = time.time()
         time_lapsed = end_time - start_time
 
-        adj_accuracy, adj_precision, adj_recall, adj_f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
-        # arr_accuracy, arr_precision, arr_recall, arr_f1 = global_orientation_metric_evaluation(oracle_adj_mat, estim_adj_mat)
+        adj_accuracy, adj_precision, adj_recall, adj_f1 = global_skeleton_metric_evaluation(oracle_adj_mat,
+                                                                                            estim_adj_mat)
 
         oracle_CPDAG_adj_mat = DAG_to_CPDAG(oracle_adj_mat)
         estim_CPDAG_adj_mat = DAG_to_CPDAG(estim_adj_mat)
@@ -461,40 +411,18 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         adj_recalls.append(adj_recall)
         adj_f1s.append(adj_f1)
 
-        # arr_accuracies.append(arr_accuracy)
-        # arr_precisions.append(arr_precision)
-        # arr_recalls.append(arr_recall)
-        # arr_f1s.append(arr_f1)
-
         SHDs.append(SHD)
         CI_numbers.append(ci_number)
         Times.append(time_lapsed)
-
-    # list_of_columns = [adj_accuracies, adj_precisions, adj_recalls, adj_f1s, arr_accuracies, arr_precisions, arr_recalls, arr_f1s, SHDs, CI_numbers, Times]
-    list_of_columns = [adj_accuracies, adj_precisions, adj_recalls, adj_f1s, SHDs, CI_numbers, Times]
-    for col in list_of_columns:
-        col = np.array(col)
 
     adj_accuracies_mean, adj_accuracies_std = np.mean(adj_accuracies), np.std(adj_accuracies)
     adj_f1s_mean, adj_f1s_std = np.mean(adj_f1s), np.std(adj_f1s)
     adj_precisions_mean, adj_precisions_std = np.mean(adj_precisions), np.std(adj_precisions)
     adj_recalls_mean, adj_recalls_std = np.mean(adj_recalls), np.std(adj_recalls)
 
-    # arr_accuracies_mean, arr_accuracies_std = np.mean(arr_accuracies), np.std(arr_accuracies)
-    # arr_f1s_mean, arr_f1s_std = np.mean(arr_f1s), np.std(arr_f1s)
-    # arr_precisions_mean, arr_precisions_std = np.mean(arr_precisions), np.std(arr_precisions)
-    # arr_recalls_mean, arr_recalls_std = np.mean(arr_recalls), np.std(arr_recalls)
-
     SHDs_mean, SHDs_std = np.mean(SHDs), np.std(SHDs)
     CI_numbers_mean, CI_numbers_std = np.mean(CI_numbers), np.std(CI_numbers)
     Times_mean, Times_std = np.mean(Times), np.std(Times)
-
-    # return adj_accuracies_mean, adj_f1s_mean, adj_precisions_mean, adj_recalls_mean, \
-    #         arr_accuracies_mean, arr_f1s_mean, arr_precisions_mean, arr_recalls_mean, \
-    #         SHDs_mean, CI_numbers_mean, Times_mean, \
-    #         adj_accuracies_std, adj_f1s_std, adj_precisions_std, adj_recalls_std, \
-    #         arr_accuracies_std, arr_f1s_std, arr_precisions_std, arr_recalls_std, \
-    #         SHDs_std, CI_numbers_std, Times_std
 
     return adj_accuracies_mean, adj_f1s_mean, adj_precisions_mean, adj_recalls_mean, \
         SHDs_mean, CI_numbers_mean, Times_mean, \
@@ -502,7 +430,26 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         SHDs_std, CI_numbers_std, Times_std
 
 
+def get_oracle_adj_mat(path, real_graph_path):
+    examplePath = path + str(1) + ".csv"
+    _data = pd.read_csv(examplePath)
+    number, all_number_Para = np.shape(_data)
+    true_adj_mat = get_adj_mat(all_number_Para, real_graph_path)
+    true_graph = nx.DiGraph(true_adj_mat)
+    oracle_adj_mat = pc_stable_oracle(true_adj_mat, true_graph, is_orientation=True)
+    return oracle_adj_mat
+
+
+def load_data(path, m):
+    completePath = path + str(m + 1) + ".csv"
+    data = pd.read_csv(completePath)
+    number, kVar = np.shape(data)
+    data.columns = [i for i in range(kVar)]
+    return data
+
+
 def get_adj_dict(real_graph_path):
+    # TODO
     adj_dict = collections.defaultdict(list)
     with open(real_graph_path) as fileobject:
         i = 0

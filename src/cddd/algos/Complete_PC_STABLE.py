@@ -26,7 +26,6 @@ def pc_stable(data, alpha, reliability_criterion='classic', is_orientation=False
                 if len(conditioning_set_pool) >= k:
                     k_length_conditioning_sets = combinations(conditioning_set_pool, k)
                     for cond_set in k_length_conditioning_sets:
-                        # pval, _ = cond_indep_test(data, target, candidate, cond_set, is_discrete)
                         pval, _ = ci_tester.ci_test(data, target, candidate, cond_set)
                         ci_number += 1
                         if pval > alpha:

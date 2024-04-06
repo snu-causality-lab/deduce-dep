@@ -16,7 +16,6 @@ def deduce_dep(data, X, Y, Z, k, alpha, add_ci_set, sepsets, consets=None, ci_te
                     pval = 0
 
                 else:
-                    # pval, _ = cond_indep_test(data, A, B, C)
                     pval, _ = ci_tester.ci_test(data, A, B, C)
                     add_ci_set.append('1')
 

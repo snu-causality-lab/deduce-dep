@@ -12,7 +12,6 @@ def HITON_PC_oracle(data, assoc, target, alpha, true_graph, ci_tester=None):
 
     total_variables = [var for var in range(num_of_variables) if var != target]
     for x in total_variables:
-        # pval_gp, dep_gp = cond_indep_test(data, target, x, [], is_discrete)
         pval_gp, dep_gp = ci_tester.ci_test(data, target, x, [])
         assoc[target][x] = dep_gp
 

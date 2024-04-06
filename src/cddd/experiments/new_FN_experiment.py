@@ -1,4 +1,3 @@
-import os
 import random
 from collections import Counter
 from itertools import product
@@ -12,6 +11,7 @@ from cddd.cit import ci_test_factory
 from cddd.deductive_reasoning import deduce_dep
 from cddd.evaluation import get_adj_mat
 from cddd.sampling import shuffled
+from cddd.utils import safe_save_to_csv
 
 
 def new_fn_experiment(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30):
@@ -42,20 +42,16 @@ def new_fn_experiment(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 
                 number_of_data, num_vars = np.shape(data)
                 data.columns = [i for i in range(num_vars)]
 
-                result_mth = fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, 20, ci_tester=ci_tester)
+                result_mth = __fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, 20, ci_tester=ci_tester)
 
                 result.extend(result_mth)
 
         # write and save the experiment result as a csv file
-        df_for_result = pd.DataFrame(result, columns=columns)
         result_file_path = f'{working_dir}/results/new_fn_result_{alpha}_{K}.csv'
-        if not os.path.exists(result_file_path):
-            df_for_result.to_csv(result_file_path, mode='w')
-        else:
-            df_for_result.to_csv(result_file_path, mode='a', header=False)
+        safe_save_to_csv(result, columns, result_file_path)
 
 
-def fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, n_repeats=20, ci_tester=None):
+def __fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, n_repeats=20, ci_tester=None):
     result_mth = []
     sepsets = dict()
     consets = dict()
@@ -70,7 +66,6 @@ def fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, tr
         X, Y, *_ = shuffled(Vs - Zs)
 
         truth = nx.d_separated(true_graph, {X}, {Y}, Zs)
-        # pval, _ = cond_indep_test(data, X, Y, list(Zs))
         pval, _ = ci_tester.ci_test(data, X, Y, list(Zs))
         stat_estim = (pval > alpha)
 
@@ -106,24 +101,7 @@ def fn_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, tr
 
         is_deductive_reasoning = (i != 0)
 
-        # print("<results_deduce>" if is_deductive_reasoning else "<results_stat>")
-        # print("TP, TN, FP, FN:", TP, TN, FP, FN)
-        # print("accuracy:", accuracy)
-        # print("precision:", precision)
-        # print("recall:", recall)
-        # print("f1:", f1)
         new_row = [BN, size_of_sampled_dataset, is_deductive_reasoning,
                    accuracy, precision, recall, f1]
         result_mth.append(new_row)
     return result_mth
-
-#
-# if __name__ == '__main__':
-#     from joblib import Parallel, delayed
-#     from itertools import product
-#     import multiprocessing as mp
-#
-#     BNs = ['ER_10_12', 'ER_10_15', 'ER_10_20', 'ER_20_24', 'ER_20_30', 'ER_20_40', 'ER_30_36', 'ER_30_45', 'ER_30_60']
-#     BNs += ['alarm', 'asia', 'child', 'insurance', 'sachs', 'water']
-#
-#     Parallel(n_jobs=mp.cpu_count())(delayed(new_fn_experiment)(BN) for BN in BNs)

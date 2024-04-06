@@ -2,13 +2,13 @@ from itertools import combinations
 
 import networkx as nx
 import numpy as np
-import pandas as pd
 
 from cddd.algos.algo_utils import estimate_cpdag
 
 
 def pc_stable_oracle(true_adj_mat, true_graph, is_orientation=False):
     num_of_variables = len(true_adj_mat)
+    # TODO just return a skeleton directly.
     adj_mat = [[1 if i != j else 0 for j in range(num_of_variables)] for i in range(num_of_variables)]
     sepsets = dict()
 

@@ -1,10 +1,10 @@
-import os
 from itertools import product
 
 import pandas as pd
 
 from cddd.cit import ci_test_factory
 from cddd.evaluation import cond_evaluation
+from cddd.utils import safe_save_to_csv
 
 
 def cond_experiment(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 1000, 2000), sampling_number=30):
@@ -13,7 +13,6 @@ def cond_experiment(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 10
     ci_tester = ci_test_factory(ci_tester_name)
 
     # constants
-    isdiscrete = True
     Ks = [0, 1, 2]
     Alphas = [0.05, 0.01]
 
@@ -37,32 +36,9 @@ def cond_experiment(BN, ci_tester_name, working_dir, dataset_sizes=(200, 500, 10
 
             for correction_rule in correction_rules:
                 for reliability_criterion in reliability_criterions:
-                    F1, Precision, Recall, Distance, CI_number, Time, \
-                        F1_std, Precision_std, Recall_std, CI_number_std, Time_std = cond_evaluation(data_path, num_para, list_target, real_graph_path, correction_rule, file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester)
+                    outs = cond_evaluation(data_path, num_para, list_target, real_graph_path, correction_rule, file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester)
+                    result.append([BN, size_of_sampled_dataset, correction_rule, reliability_criterion, *outs])
 
-                    # print("------------------------------------------------------")
-                    # print("the BN of dataset is:", BN)
-                    # print("the size of dataset is:", size_of_sampled_dataset)
-                    # print("Correction rule is:", correction_rule)
-                    # print("Reliability criterion:", reliability_criterion)
-                    # print()
-                    # print("F1 is: " + str("%.2f " % F1) + " with std: " + str("%.2f" % F1_std))
-                    # print("Precision is: " + str("%.2f" % Precision) + " with std: " + str("%.2f" % Precision_std))
-                    # print("Recall is: " + str("%.2f" % Recall) + " with std: " + str("%.2f" % Recall_std))
-                    # # print("Distance is: " + str("%.2f" % Distance))
-                    # print("CI_number is: " + str("%.2f" % CI_number) + " with std: " + str("%.2f" % CI_number_std))
-                    # print("Time is: " + str("%.2f" % Time) + " with std: " + str("%.2f" % Time_std))
-
-                    new_row = [BN, size_of_sampled_dataset, correction_rule, reliability_criterion,
-                               F1, Precision, Recall, Distance, CI_number, Time,
-                               F1_std, Precision_std, Recall_std, CI_number_std, Time_std]
-                    result.append(new_row)
-
-        # write and save the experiment result as a csv file
-        df_for_result = pd.DataFrame(result, columns=columns)
         result_file_path = f'{working_dir}/results/cond_result_{alpha}_{K}.csv'
+        safe_save_to_csv(result, columns, result_file_path)
 
-        if not os.path.exists(result_file_path):
-            df_for_result.to_csv(result_file_path, mode='w')
-        else:
-            df_for_result.to_csv(result_file_path, mode='a', header=False)

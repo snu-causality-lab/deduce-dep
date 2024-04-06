@@ -1,21 +1,20 @@
-import os
 import random
 from collections import Counter
 
-import pandas as pd
 from numpy.random import randint, choice
 
 from cddd.cit import ci_test_factory
 from cddd.deductive_reasoning import deduce_dep
 from cddd.sampling import random_BN, shuffled
+from cddd.utils import safe_save_to_csv
 
 
 def fn_experiment(working_dir, nums_vars=(10, 20, 30), times_vars=(1.2, 1.5, 2), dataset_sizes=(200, 500, 1000)):
     for alpha in (0.01, 0.05):
-        _fn_experiment_core(working_dir, alpha, nums_vars, times_vars, dataset_sizes)
+        __fn_experiment_core(working_dir, alpha, nums_vars, times_vars, dataset_sizes)
 
 
-def _fn_experiment_core(working_dir, alpha, nums_vars, times_vars, dataset_sizes):
+def __fn_experiment_core(working_dir, alpha, nums_vars, times_vars, dataset_sizes):
     assert alpha in {0.01, 0.05}
     alpha_str = {0.01: '001', 0.05: '005'}
     # experiments settings
@@ -23,7 +22,6 @@ def _fn_experiment_core(working_dir, alpha, nums_vars, times_vars, dataset_sizes
     # experiment results
     columns = ['num_vars', 'num_edges', 'data_set_size', 'is_deductive_reasoning',
                'Accuracy', 'Precision', 'Recall', 'F1']
-    # columns = ['truth', 'stat_estim', 'deduce_estim']
     result = []
 
     for num_vars in nums_vars:
@@ -31,7 +29,6 @@ def _fn_experiment_core(working_dir, alpha, nums_vars, times_vars, dataset_sizes
             for data_set_size in dataset_sizes:
                 num_edges = int(times_var * num_vars)
                 random.seed(0)
-                # is_discrete = True
 
                 for _ in range(50):
                     # randomly generate a Bayesian network
@@ -44,7 +41,7 @@ def _fn_experiment_core(working_dir, alpha, nums_vars, times_vars, dataset_sizes
                     consets = dict()
                     add_ci_set = []
 
-                    results_stat = []
+                    results_stat = []  # type:
                     results_deduce = []
                     results_all = []
 
@@ -90,33 +87,10 @@ def _fn_experiment_core(working_dir, alpha, nums_vars, times_vars, dataset_sizes
 
                         is_deductive_reasoning = (i != 0)
 
-                        # print("<results_deduce>" if is_deductive_reasoning else "<results_stat>")
-                        # print("TP, TN, FP, FN:", TP, TN, FP, FN)
-                        # print("accuracy:", accuracy)
-                        # print("precision:", precision)
-                        # print("recall:", recall)
-                        # print("f1:", f1)
-
                         new_row = [num_vars, num_edges, data_set_size, is_deductive_reasoning,
                                    accuracy, precision, recall, f1]
                         result.append(new_row)
 
     # write and save the experiment result as a csv file
-    df_for_result = pd.DataFrame(result, columns=columns)
     result_file_path = f'{working_dir}/results/fn_result_alpha_{alpha_str[alpha]}.csv'
-
-    if not os.path.exists(result_file_path):
-        df_for_result.to_csv(result_file_path, mode='w')
-    else:
-        df_for_result.to_csv(result_file_path, mode='a', header=False)
-
-# def naive_deduce_dep(data, X, Y, Zs, alpha):
-#     for z in Zs:
-#         remaining_Zs = list(set(Zs) - {z})
-#         pval_XYZs, _ = cond_indep_test(data, X, Y, list(remaining_Zs))
-#         pval_XzZs, _ = cond_indep_test(data, X, z, list(remaining_Zs))
-#         pval_YzZs, _ = cond_indep_test(data, Y, z, list(remaining_Zs))
-#
-#         if (pval_XYZs < alpha) ^ ((pval_XzZs < alpha) and (pval_YzZs < alpha)):
-#             return True
-#     return False
+    safe_save_to_csv(result, columns, result_file_path)

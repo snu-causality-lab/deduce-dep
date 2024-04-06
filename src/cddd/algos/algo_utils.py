@@ -16,7 +16,6 @@ def estimate_cpdag(skel_graph, sep_set):
     Returns:
         An estimated DAG.
     """
-    # dag = skel_graph.to_directed()
     dag = skel_graph
     node_ids = skel_graph.nodes()
 
@@ -56,8 +55,6 @@ def is_adjacent(dag, i, j):
 def apply_meeks_rule(dag: nx.DiGraph):
     # For all the combination of nodes i and j, apply the following
     # rules.
-    # old_dag = dag.copy()
-    # node_ids = old_dag.nodes()
     changed = True
     while changed:
         changed = False
@@ -160,8 +157,5 @@ def apply_meeks_rule(dag: nx.DiGraph):
                                 changed = True
                                 break
 
-        # if nx.is_isomorphic(dag, old_dag):
-        #     break
         if not changed:
             break
-        # old_dag = dag.copy()
