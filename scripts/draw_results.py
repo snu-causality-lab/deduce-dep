@@ -74,7 +74,7 @@ def correction_draw(results_dir, K):
                 for crit_k, crit_v in crit_dict.items():
                     df_crit = df_crit[df[crit_k] == crit_v]
 
-                x = np.array([200, 500, 1000, 2000])  # df_crit['data_set_size']
+                x = np.array([200, 500, 1000, 2000])
                 gb_y = df_crit.groupby('data_set_size')[metric].mean()
                 gb_counts = df_crit.groupby('data_set_size')[metric].count()
                 y = [gb_y[_] if _ in gb_y else 0 for _ in x]  # just in case we didn't experiment.... for some reasons
@@ -295,14 +295,14 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
 
 
 if __name__ == '__main__':
-    WORKING_DIR = '/Users/sanghacklee/Dropbox/python_projs/CD_DD'
+    WORKING_DIR = '/Users/johndoe/CD_DD'
     results_dir = f'{WORKING_DIR}/results'
 
     # draw for performance
     drop_duplicates(results_dir)
     for K in [0, 1, 2]:
         create_all_algo(results_dir, K)
-        # TODO previous version used 10 samples, now 30, please change repeated accordingly
+        # TODO previous version used 10 samples, now 30, please change repeated accordingly (for correct confidence intervals)
         draw_for_perf_experiments(results_dir, K, repeated=10)
 
     # draw for correction
