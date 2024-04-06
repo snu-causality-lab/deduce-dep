@@ -35,11 +35,13 @@ if __name__ == '__main__':
 
     else:
         # full (+additional) experimentation (this may not include tests reported during the rebuttal)
-        BNs = ['ER_10_12', 'ER_10_15', 'ER_10_20', 'ER_20_24', 'ER_20_30', 'ER_20_40', 'ER_30_36', 'ERcd_30_45', 'ER_30_60',
+        BNs = ['ER_10_12', 'ER_10_15', 'ER_10_20',
+               'ER_20_24', 'ER_20_30', 'ER_20_40',
+               'ER_30_36', 'ER_30_45', 'ER_30_60',
                'alarm', 'insurance', 'sachs', 'asia', 'child', 'water']
         CITs = ['G2'] * len(BNs)
         nums_vars = (10, 20, 30)
-        Ks = [0, 1]
+        Ks = [0, 1, 2]
         Alphas = [0.05, 0.01]
         edge_ratios = (1.2, 1.5, 2)
         dataset_sizes = (200, 500, 1000, 2000)
