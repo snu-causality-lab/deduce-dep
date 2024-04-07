@@ -38,7 +38,7 @@ def logical_and(xs):
 
 def bootstrap(data, B=500):
     # input : original data, B
-    # output : B개의 bootstrapped sub-dataset
+    # output : B bootstrapped sub-dataset
     bootstrapped_datasets = [data.sample(frac=1, replace=True) for _ in range(B)]
     return bootstrapped_datasets
 
