@@ -43,7 +43,6 @@ def bootstrap(data, B=500):
     return bootstrapped_datasets
 
 
-
 class visited_queue(Generic[H]):
     def __init__(self, xs: Collection[H]):
         self.queue = deque(xs)
