@@ -11,6 +11,7 @@ since some of the random seeds are changed. But there will be no problem observi
 ## Preparation
 
 At this moment, we only support Unix-based systems (we hard-coded path separators as `/`).
+You may place `CD_DD` in your home directory. (Otherwise, you may need to change some variables in python scripts later.) 
 Please use `python` 3.11 since we did not test other versions.
 You may install python packages necessary to
 run experiments by first checking `requirements.txt` (you may ignore version constraints for the packages listed in the requirements.txt.)
@@ -37,8 +38,7 @@ Those files in scripts folder, `scripts`
 
 `sample_data.py` script will create two directories `Ground_truth` and `Sampled_datasets` under `~/CD_DD/data`
 and generate DAGs and corresponding samples used in the paper.   
-Please change `WORKING_DIR` variable in the script properly, e.g., `WORKING_DIR = '/home/johndoe/CD_DD'`
-(Note that the current code does not expand tilde `~` to an actual home directory. Please specify `WORK_DIR` based on an absolute path.)
+Please change `WORKING_DIR` variable in the script properly. Currently, `WORKING_DIR = '~/CD_DD'`
 
 `python3 sample_data.py`
 
@@ -51,7 +51,7 @@ Also it may take (less than) 1GB of storage.
 `conduct_experiments.py` will run multiple experiments simultaneously.
 If you don't need to reproduce results similar to the paper, you may select some of the datasets and parameters for algorithms.
 `~/CD_DD/results` will be created and csv files will be generated. You can also control parallelism by changing values for `n_jobs` (the number of CPU cores to utilize.)
-Again, please change `WORKING_DIR` variable in the script properly, e.g., `WORKING_DIR = '/home/johndoe/CD_DD'`
+Again, please change `WORKING_DIR` variable in the script properly.
 
 `python3 conduct_experiments.py`
 

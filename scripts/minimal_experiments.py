@@ -1,9 +1,10 @@
+import os
 from pathlib import Path
 
 from cddd.experiments.PC_stable_experiment import pc_stable_experiment
 
 if __name__ == '__main__':
-    WORKING_DIR = '/home/johndoe/CD_DD'
+    WORKING_DIR = os.path.expanduser('~/CD_DD')
     results_dir = f'{WORKING_DIR}/results'
     Path(results_dir).mkdir(parents=True, exist_ok=True)
 

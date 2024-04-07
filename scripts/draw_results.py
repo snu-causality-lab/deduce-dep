@@ -1,5 +1,6 @@
 import itertools
 import math
+import os
 
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
@@ -297,7 +298,7 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
 
 
 if __name__ == '__main__':
-    WORKING_DIR = '/home/johndoe/CD_DD'
+    WORKING_DIR = os.path.expanduser('~/CD_DD')
     results_dir = f'{WORKING_DIR}/results'
 
     # draw for performance

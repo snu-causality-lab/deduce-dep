@@ -1,5 +1,6 @@
 import itertools
 import multiprocessing as mp
+import os
 from pathlib import Path
 
 from joblib import Parallel, delayed
@@ -12,7 +13,7 @@ from cddd.experiments.new_FN_experiment import new_fn_experiment
 
 if __name__ == '__main__':
     n_jobs = mp.cpu_count()
-    WORKING_DIR = '/home/johndoe/CD_DD'
+    WORKING_DIR = os.path.expanduser('~/CD_DD')
     results_dir = f'{WORKING_DIR}/results'
     Path(results_dir).mkdir(parents=True, exist_ok=True)
 

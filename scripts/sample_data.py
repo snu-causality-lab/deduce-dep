@@ -1,5 +1,6 @@
 import multiprocessing
 import multiprocessing as mp
+import os
 import random
 import warnings
 from itertools import product
@@ -240,7 +241,7 @@ if __name__ == '__main__':
 
     # You will see (a lot of ignorable) warnings like
     # [d3blocks] >WARNING> Probability values don't exactly sum to 1. Differ by: -2.220446049250313e-16. Adjusting values.
-    WORKING_DIR = '/home/johndoe/CD_DD'
+    WORKING_DIR = os.path.expanduser('~/CD_DD')
     graph_dir = f'{WORKING_DIR}/data/Ground_truth'
     data_dir = f'{WORKING_DIR}/data/Sampled_datasets'
 
