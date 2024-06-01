@@ -45,7 +45,7 @@ if __name__ == '__main__':
              for (BN, cit), alpha, K, dataset_size, sample_id
              in itertools.product(list(zip(BNs, CITs)), Alphas, Ks, dataset_sizes, list(range(1, num_sampling + 1)))),
 
-            (delayed(cond_experiment)(BN, alpha, K, cit, WORKING_DIR, dataset_size, num_sampling)
+            (delayed(cond_experiment)(BN, alpha, K, cit, WORKING_DIR, dataset_size, num_sampling, reliability_criteria)
              for (BN, cit), alpha, K, dataset_size in itertools.product(list(zip(BNs, CITs)), Alphas, Ks, dataset_sizes)),
 
             (delayed(pc_stable_experiment)(BN, cit, WORKING_DIR, size_of_sampled_dataset, num_sampling, K, Alpha)

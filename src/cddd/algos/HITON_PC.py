@@ -105,7 +105,6 @@ def HITON_PC(data, assoc, target, alpha, reliability_criterion='classic', K=1, c
                     else:
                         consets[tuple(sorted([target, TPC_var]))] = cond_set
 
-    # print(ci_number, len(add_ci_set))
     ci_number += len(add_ci_set)
     return list(set(TPC)), sepsets, ci_number
 
@@ -117,7 +116,7 @@ def set_reliability_criterion(reliability_criterion):
         is_deductive_reasoning = False
     elif reliability_criterion == 'classic':
         h_ps = 5
-        max_k = 3
+        max_k = float('inf')
         is_deductive_reasoning = False
     elif reliability_criterion == 'deductive_reasoning':
         h_ps = 0
@@ -125,7 +124,7 @@ def set_reliability_criterion(reliability_criterion):
         is_deductive_reasoning = True
     elif reliability_criterion == 'both':
         h_ps = 5
-        max_k = 3
+        max_k = float('inf')
         is_deductive_reasoning = True
     else:
         raise AssertionError(f'unknown reliability criterion: {reliability_criterion}.')
