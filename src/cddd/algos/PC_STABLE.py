@@ -1,8 +1,6 @@
 from itertools import combinations
-
 import networkx as nx
 import numpy as np
-
 from cddd.algos.algo_utils import estimate_cpdag
 from cddd.deductive_reasoning import deduce_dep
 
