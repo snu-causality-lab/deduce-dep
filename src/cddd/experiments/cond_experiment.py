@@ -5,7 +5,7 @@ from cddd.evaluation import cond_evaluation
 from cddd.utils import safe_save_to_csv
 
 
-def cond_experiment(BN, alpha, K, ci_tester_name, working_dir, size_of_sampled_dataset, sampling_number=30, reliability_criterions = ['no', 'deductive_reasoning']):
+def cond_experiment(BN, alpha, K, ci_tester_name, working_dir, size_of_sampled_dataset, sampling_number=30, reliability_criterions=('no', 'deductive_reasoning')):
     correction_rules = ['AND']
     ci_tester = ci_test_factory(ci_tester_name)
 

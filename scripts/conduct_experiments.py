@@ -31,10 +31,6 @@ if __name__ == '__main__':
     num_sampling = 30
     reliability_criteria = ['no', 'deductive_reasoning']
 
-    # Sorry for some inconsistencies in the order of arguments &
-    # also some of the `options' are already specified inside the functions,
-    # thus, changing above options may not affect some of the outputs
-
     Parallel(n_jobs=n_jobs)(
         itertools.chain(
             (delayed(cached_pc_stable_experiment)(Alphas, BN, Ks, ci_tester_name, reliability_criteria, sample_id,

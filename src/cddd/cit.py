@@ -184,16 +184,6 @@ def g2_test_dis(data_matrix, x, y, s, **kwargs):
     return g_square_dis(data_matrix, x, y, s1, levels)
 
 
-def cond_indep_test(data, X, Y, cond_set=None, is_discrete=True):
-    if cond_set is None:
-        cond_set = []
-    if is_discrete:
-        pval, dep = g2_test_dis(data, X, Y, cond_set)
-        return pval, dep
-    else:
-        raise AssertionError('currently not supported.')
-
-
 class CITester:
     def __init__(self, **kwargs):
         ...

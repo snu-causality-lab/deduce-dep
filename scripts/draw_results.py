@@ -39,11 +39,11 @@ def correction_draw(results_dir, K):
         'is_deductive_reasoning': [False, True],
         'alpha': [0.01, 0.05]
     }
-    Es = {
-        10: [12, 15, 20],
-        20: [24, 30, 40],
-        30: [36, 45, 60]
-    }
+    # Es = {
+    #     10: [12, 15, 20],
+    #     20: [24, 30, 40],
+    #     30: [36, 45, 60]
+    # }
 
     BNs = ['ER_10_12', 'ER_10_15', 'ER_10_20',
            'ER_20_24', 'ER_20_30', 'ER_20_40',
@@ -90,7 +90,6 @@ def correction_draw(results_dir, K):
                 # shift += 20
 
             ax.set_xticks(x)
-            # ax.set_title(f'$|V|={n_V}, |E|={n_E}$')
             ax.set_title(BN)
             if ax_idx >= 4:
                 ax.set_xlabel('size of dataset')
@@ -188,7 +187,7 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
     networks = ['ER_10_12', 'ER_10_15', 'ER_10_20', 'ER_20_24', 'ER_20_30', 'ER_20_40', 'ER_30_36', 'ER_30_45', 'ER_30_60']
     networks += ['alarm', 'sachs', 'insurance', 'asia', 'child', 'water']
     alphas = [0.01, 0.05]
-    criteria = {'algo': algos, 'BN': networks, 'alpha': alphas}
+    # criteria = {'algo': algos, 'BN': networks, 'alpha': alphas}
     mapping = {'HITON-PC': 'HITON', 'PC': 'PC', 'alarm': 'Alarm', 'sachs': 'Sachs', 'insurance': 'Insurance',
                'asia': 'Asia', 'child': 'Child', 'water': 'Water',
                'CI_number': '\# CI Tests'}
@@ -209,11 +208,7 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
                   for crit_vs in itertools.product(*[crits[k] for k in crits.keys()])]
 
     for metric in ('F1', 'Precision', 'Recall', 'Time', 'CI_number'):
-        if False:
-            fig = plt.figure(figsize=(4.75, 6.25))  # two days before submission version
-        else:
-            # fig = plt.figure(figsize=(4.75, 6.75))  # longer version
-            fig = plt.figure(figsize=(12, 15))
+        fig = plt.figure(figsize=(12, 15))
         grid = gridspec.GridSpec(6, 5, figure=fig)
         plt.subplots_adjust(wspace=1, hspace=1)
         x = []

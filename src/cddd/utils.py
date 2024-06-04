@@ -13,4 +13,3 @@ def safe_save_to_csv(result: List[List], columns: List[str], file_path: str):
             df.to_csv(file_path, mode='w')
         else:
             df.to_csv(file_path, mode='a', header=False)
-
