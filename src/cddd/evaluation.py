@@ -77,6 +77,80 @@ def global_skeleton_metric_evaluation(true_adj_mat, estim_adj_mat):
     return accuracy, precision, recall, f1
 
 
+def global_orientation_metric_evaluation(true_adj_mat, estim_adj_mat):
+    num_vars = len(true_adj_mat[0])
+    node_list = [i for i in range(num_vars)]
+    TP = 0
+    TN = 0
+    FP = 0
+    FN = 0
+
+    for var1, var2 in combinations(node_list, 2):
+        # identify endpoint var1, var2
+        # types of endpoint : tail (1), arrowhead (2), undirected (3), null (4)
+
+        truth_var1_var2 = true_adj_mat[var1][var2]
+        truth_var2_var1 = true_adj_mat[var2][var1]
+
+        if truth_var1_var2 and truth_var2_var1:
+            true_endpoint_var1 = 3
+            true_endpoint_var2 = 3
+        elif (truth_var1_var2) and (not truth_var2_var1):
+            true_endpoint_var1 = 1
+            true_endpoint_var2 = 2
+        elif (not truth_var1_var2) and (truth_var2_var1):
+            true_endpoint_var1 = 2
+            true_endpoint_var2 = 1
+        else:
+            true_endpoint_var1 = 4
+            true_endpoint_var2 = 4
+
+        estim_var1_var2 = estim_adj_mat[var1][var2]
+        estim_var2_var1 = estim_adj_mat[var2][var1]
+
+        if estim_var1_var2 and estim_var2_var1:
+            estim_endpoint_var1 = 3
+            estim_endpoint_var2 = 3
+        elif (estim_var1_var2) and (not estim_var2_var1):
+            # print("estim!")
+            estim_endpoint_var1 = 1
+            estim_endpoint_var2 = 2
+        elif (not estim_var1_var2) and (estim_var2_var1):
+            # print("estim!")
+            estim_endpoint_var1 = 2
+            estim_endpoint_var2 = 1
+        else:
+            estim_endpoint_var1 = 4
+            estim_endpoint_var2 = 4
+
+        # check var1 endpoint
+        if true_endpoint_var1 == 2 and estim_endpoint_var1 == 2:
+            TP += 1
+        elif (not true_endpoint_var1 == 2) and (estim_endpoint_var1 == 2):
+            FP += 1
+        elif (true_endpoint_var1 == 2) and (not estim_endpoint_var1 == 2):
+            FN += 1
+        else:
+            TN += 1
+
+        # check var2 endpoint
+        if true_endpoint_var2 == 2 and estim_endpoint_var2 == 2:
+            TP += 1
+        elif (not true_endpoint_var2 == 2) and (estim_endpoint_var2 == 2):
+            FP += 1
+        elif (true_endpoint_var2 == 2) and (not estim_endpoint_var2 == 2):
+            FN += 1
+        else:
+            TN += 1
+
+    accuracy = (TP + TN) / (TP + FN + FP + TN)
+    precision = (TP / (TP + FP)) if TP + FP > 0 else 0
+    recall = (TP / (TP + FN)) if TP + FN > 0 else 0
+    f1 = ((2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0)
+
+    return accuracy, precision, recall, f1
+
+
 def DAG_to_CPDAG(adj_mat):
     GT = nx.DiGraph(adj_mat)
     nodes = list(GT.nodes)
@@ -173,6 +247,68 @@ def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, f
 
     return F1 / commonDivisor, Precision / commonDivisor, Recall / commonDivisor, Distance / commonDivisor, total_ci_number / commonDivisor, total_time / commonDivisor, \
         F1s_std, Precisions_std, Recalls_std, CI_numbers_std, Times_std
+
+
+# def pc_evaluation(path, real_graph_path, filenumber, alpha, reliability_criterion='classic', ci_tester=None):
+#     # pre_set variables are zero
+#     Accuracy = 0
+#     Precision = 0
+#     Recall = 0
+#     F1 = 0
+#     total_ci_number = 0
+#     total_time = 0
+#
+#     F1s = []
+#     Precisions = []
+#     Recalls = []
+#     CI_numbers = []
+#     Times = []
+#
+#     true_adj_dict = get_adj_dict(real_graph_path)
+#     true_graph = nx.DiGraph(true_adj_dict)
+#     oracle_adj_mat = pc_oracle(true_adj_dict, true_graph)
+#
+#     for m in range(filenumber):
+#         completePath = path + str(m + 1) + ".csv"
+#         data = pd.read_csv(completePath)
+#         number, kVar = np.shape(data)
+#         data.columns = [i for i in range(kVar)]
+#
+#         start_time = time.time()
+#         estim_adj_mat, sepsets, ci_number = pc(data, alpha, reliability_criterion, ci_tester=ci_tester)
+#         end_time = time.time()
+#         time_lapsed = end_time - start_time
+#         accuracy, precision, recall, f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
+#
+#         F1s.append(f1)
+#         Precisions.append(precision)
+#         Recalls.append(recall)
+#         CI_numbers.append(ci_number)
+#         Times.append(time_lapsed)
+#
+#         total_ci_number += ci_number
+#         total_time += time_lapsed
+#         Accuracy += accuracy
+#         Precision += precision
+#         Recall += recall
+#         F1 += f1
+#
+#     commonDivisor = filenumber
+#
+#     F1s = np.array(F1s)
+#     Precisions = np.array(Precisions)
+#     Recalls = np.array(Recalls)
+#     CI_numbers = np.array(CI_numbers)
+#     Times = np.array(Times)
+#
+#     F1s_std = np.std(F1s)
+#     Precisions_std = np.std(Precisions)
+#     Recalls_std = np.std(Recalls)
+#     CI_numbers_std = np.std(CI_numbers)
+#     Times_std = np.std(Times)
+#
+#     return Accuracy / commonDivisor, Precision / commonDivisor, Recall / commonDivisor, F1 / commonDivisor, total_ci_number / commonDivisor, total_time / commonDivisor, \
+#         Precisions_std, Recalls_std, F1s_std, CI_numbers_std, Times_std
 
 
 def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic', K=1,

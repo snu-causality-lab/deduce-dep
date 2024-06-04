@@ -1,6 +1,8 @@
 from functools import reduce
 from itertools import combinations
+
 import numpy as np
+
 from cddd.deductive_reasoning import deduce_dep
 
 

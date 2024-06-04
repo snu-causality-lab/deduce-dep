@@ -36,6 +36,13 @@ def logical_and(xs):
     return out
 
 
+def bootstrap(data, B=500):
+    # input : original data, B
+    # output : B bootstrapped sub-dataset
+    bootstrapped_datasets = [data.sample(frac=1, replace=True) for _ in range(B)]
+    return bootstrapped_datasets
+
+
 class visited_queue(Generic[H]):
     def __init__(self, xs: Collection[H]):
         self.queue = deque(xs)
