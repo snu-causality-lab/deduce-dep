@@ -204,7 +204,7 @@ def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, relia
         data.columns = [i for i in range(kVar)]
 
         start_time = time.time()
-        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion, K, ci_tester=ci_tester)
+        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion=reliability_criterion, is_orientation=False, K=K, ci_tester=ci_tester)
         end_time = time.time()
         time_lapsed = end_time - start_time
         accuracy, precision, recall, f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
@@ -258,7 +258,7 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         data = load_data(path, m)
 
         start_time = time.time()
-        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion, is_orientation=True, K=K,
+        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion=reliability_criterion, is_orientation=True, K=K,
                                                       ci_tester=ci_tester)
         end_time = time.time()
         time_lapsed = end_time - start_time

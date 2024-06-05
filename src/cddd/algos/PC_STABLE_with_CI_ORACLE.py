@@ -9,6 +9,9 @@ from cddd.algos.algo_utils import estimate_cpdag
 def pc_stable_oracle(true_adj_mat, true_graph, is_orientation=False):
     num_of_variables = len(true_adj_mat)
     # TODO just return a skeleton directly.
+    true_adj_mat = np.array(true_adj_mat)
+    true_adj_mat = true_adj_mat + true_adj_mat.T
+
     adj_mat = [[1 if i != j else 0 for j in range(num_of_variables)] for i in range(num_of_variables)]
     sepsets = dict()
 
@@ -34,7 +37,8 @@ def pc_stable_oracle(true_adj_mat, true_graph, is_orientation=False):
             adj_mat[var2][var1] = 0
 
     if not is_orientation:
-        return adj_mat
+        return true_adj_mat
+        # return adj_mat
     else:
         adj_mat = np.array(adj_mat)
         skel_graph = nx.DiGraph(adj_mat)
