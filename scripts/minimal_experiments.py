@@ -13,6 +13,6 @@ if __name__ == '__main__':
     # with CIT based on g-squared test
     # K = 0, alpha = 0.05
     # averaged over 10 repetitions
-    pc_stable_experiment('alarm', 'G2', WORKING_DIR, 200, 10, 0, 0.05)
+    pc_stable_experiment('alarm', 'G2', WORKING_DIR, 200, 10, 0.05, 0)
     # please check
     # ~/CD_DD/results/pc_stable_result_0.05_0.csv

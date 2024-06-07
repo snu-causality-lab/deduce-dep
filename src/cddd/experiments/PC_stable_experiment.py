@@ -3,14 +3,14 @@ from cddd.evaluation import pc_stable_evaluation
 from cddd.utils import safe_save_to_csv
 
 
-def pc_stable_experiment(BN, ci_tester_name, working_dir, size_of_sampled_dataset, sampling_number, K, alpha):
+def pc_stable_experiment(BN, ci_tester_name, working_dir, size_of_sampled_dataset, sampling_number, alpha, K):
     reliability_criterions = ['no', 'deductive_reasoning']
     # constants
 
     ci_tester = ci_test_factory(ci_tester_name)
     COLUMNS = ['BN', 'size_of_sampled_dataset', 'reliability_criterion',
-               'Accuracy', 'Precision', 'Recall', 'F1', 'CI_number', 'Time',
-               'Precision_std', 'Recall_std', 'F1_std', 'CI_number_std', 'Time_std']
+                'F1', 'Precision', 'Recall', 'CI_number', 'Time',
+               'F1_std', 'Precision_std', 'Recall_std', 'CI_number_std', 'Time_std']
 
     # experiment results
     result = []

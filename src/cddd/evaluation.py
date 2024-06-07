@@ -171,7 +171,7 @@ def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, f
     CI_numbers_std = np.std(CI_numbers)
     Times_std = np.std(Times)
 
-    return F1 / commonDivisor, Precision / commonDivisor, Recall / commonDivisor, Distance / commonDivisor, total_ci_number / commonDivisor, total_time / commonDivisor, \
+    return F1 / commonDivisor, Precision / commonDivisor, Recall / commonDivisor, total_ci_number / commonDivisor, total_time / commonDivisor, \
         F1s_std, Precisions_std, Recalls_std, CI_numbers_std, Times_std
 
 
@@ -236,8 +236,8 @@ def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, relia
     CI_numbers_std = np.std(CI_numbers)
     Times_std = np.std(Times)
 
-    return Accuracy / commonDivisor, Precision / commonDivisor, Recall / commonDivisor, F1 / commonDivisor, total_ci_number / commonDivisor, total_time / commonDivisor, \
-        Precisions_std, Recalls_std, F1s_std, CI_numbers_std, Times_std
+    return F1 / commonDivisor, Precision / commonDivisor, Recall / commonDivisor,  total_ci_number / commonDivisor, total_time / commonDivisor, \
+        F1s_std, Precisions_std, Recalls_std, CI_numbers_std, Times_std
 
 
 def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic',
