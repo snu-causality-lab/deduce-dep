@@ -143,20 +143,20 @@ def drop_duplicates(results_dir):
     alphas = [0.01, 0.05]
     Ks = [0, 1, 2]
     for alpha, K in itertools.product(alphas, Ks):
-        df = pd.read_csv(results_dir + f'/cond_result_{alpha}_{K}.csv')
+        df = pd.read_csv(results_dir + f'/HITON-PC_result_{alpha}_{K}.csv')
         df = df.drop_duplicates(['BN', 'size_of_sampled_dataset', 'reliability_criterion'], keep='last')
-        df.to_csv(results_dir + f'/cond_result_{alpha}_{K}.csv')
+        df.to_csv(results_dir + f'/HITON-PC_result_{alpha}_{K}.csv')
 
-        df = pd.read_csv(results_dir + f'/pc_stable_result_{alpha}_{K}.csv')
+        df = pd.read_csv(results_dir + f'/PC_result_{alpha}_{K}.csv')
         df = df.drop_duplicates(['BN', 'size_of_sampled_dataset', 'reliability_criterion'], keep='last')
-        df.to_csv(results_dir + f'/pc_stable_result_{alpha}_{K}.csv')
+        df.to_csv(results_dir + f'/PC_result_{alpha}_{K}.csv')
 
 
 def create_all_algo(results_dir, K):
-    df_ht_005 = pd.read_csv(results_dir + f'/cond_result_0.05_{K}.csv')
-    df_ht_001 = pd.read_csv(results_dir + f'/cond_result_0.01_{K}.csv')
-    df_pc_005 = pd.read_csv(results_dir + f'/pc_stable_result_0.05_{K}.csv')
-    df_pc_001 = pd.read_csv(results_dir + f'/pc_stable_result_0.01_{K}.csv')
+    df_ht_005 = pd.read_csv(results_dir + f'/HITON-PC_result_0.05_{K}.csv')
+    df_ht_001 = pd.read_csv(results_dir + f'/HITON-PC_result_0.01_{K}.csv')
+    df_pc_005 = pd.read_csv(results_dir + f'/PC_result_0.05_{K}.csv')
+    df_pc_001 = pd.read_csv(results_dir + f'/PC_result_0.01_{K}.csv')
     dfs = [df_ht_005, df_ht_001, df_pc_005, df_pc_001]
 
     df_ht_005['algo'] = 'HITON-PC'
@@ -296,13 +296,13 @@ if __name__ == '__main__':
     WORKING_DIR = os.path.expanduser('~/CD_DD')
     results_dir = f'{WORKING_DIR}/results'
 
-    # draw for performance
-    drop_duplicates(results_dir)
+    # draw for performance experiment
+    # drop_duplicates(results_dir)
     for K in [0, 1, 2]:
         create_all_algo(results_dir, K)
         # TODO previous version used 10 samples, now 30, please change repeated accordingly (for correct confidence intervals)
         draw_for_perf_experiments(results_dir, K, repeated=30)
 
-    # draw for correction
-    for K in [0, 1, 2]:
-        correction_draw(results_dir, K)
+    # draw for correction experiment
+    # for K in [0, 1, 2]:
+    #     correction_draw(results_dir, K)
