@@ -21,12 +21,13 @@ T = TypeVar('T')
 H = TypeVar('H', bound=Hashable)
 
 
-def sample_synthetic_dataset(num_vars, num_edges, num_sampling, size, working_dir, seed=None):
+def sample_synthetic_dataset(num_vars, edge_ratio, num_sampling, size, working_dir, seed=None):
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
 
-    BN_name = f'synthetic_{num_vars}_{num_edges}'
+    num_edges = int(num_vars * edge_ratio)
+    BN_name = f'synthetic_ER_{num_vars}_{num_edges}'
     for i in range(1, num_sampling + 1):
         # randomly generate a Bayesian network
         bn = random_BN(num_vars, num_edges)
@@ -270,7 +271,13 @@ if __name__ == '__main__':
     )
 
     print('generating previous style random datasets.')  # in the submission
-    sample_synthetic_dataset(5, 10, 10, 200, WORKING_DIR, seed=0)
+    # generate data for Erdos-Renyi (previous version)
+    Parallel(n_jobs=multiprocessing.cpu_count())(
+        delayed(sample_synthetic_dataset)(
+            num_vars, edge_ratio, num_sampling, size, WORKING_DIR, seed=i)
+        for i, (num_vars, edge_ratio, size)
+        in enumerate(product(nums_vars, edge_ratios, dataset_sizes))
+    )
 
     edge_ratios = (1.8, 3.2)
     edges_to_attach = (2, 4)  # for scale-free networks
