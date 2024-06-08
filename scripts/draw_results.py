@@ -112,12 +112,20 @@ def correction_draw(result_dir):
                 for axis in ['top', 'bottom', 'left', 'right']:
                     ax.spines[axis].set_linewidth(.8)
 
+                ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+                start, end = ax.get_ylim()
+                ytick_candidates = np.arange(start, min(end, 1.0), 0.1)
+                if len(ytick_candidates) >= 6:
+                    ytick_candidates = np.arange(start, min(end, 1.0), 0.2)
+                ax.yaxis.set_ticks(ytick_candidates)
+
+
         sns.despine(fig)
         fig.tight_layout()
         if REPORTING_CONFIDENCE_INTERVAL:
-            fig.savefig(results_dir + f'fn_{metric}_CI95.pdf', bbox_inches='tight', pad_inches=0.02)
+            fig.savefig(results_dir + f'/fn_{metric}_CI95.pdf', bbox_inches='tight', pad_inches=0.02)
         else:
-            fig.savefig(results_dir + f'fn_{metric}_stdev.pdf', bbox_inches='tight', pad_inches=0.02)
+            fig.savefig(results_dir + f'/fn_{metric}_stdev.pdf', bbox_inches='tight', pad_inches=0.02)
 
 def new_correction_draw(results_dir, K):
     REPORTING_CONFIDENCE_INTERVAL = True
@@ -149,11 +157,11 @@ def new_correction_draw(results_dir, K):
     #        'ER_20_24', 'ER_20_30', 'ER_20_40',
     #        'ER_30_36', 'ER_30_45', 'ER_30_60']
 
-    # BNs += ['alarm', 'asia', 'child', 'insurance', 'sachs', 'water']
+    BNs = ['alarm', 'asia', 'child', 'insurance', 'sachs', 'water']
 
-    BNs = ['synthetic_ER_10_12', 'synthetic_ER_10_15', 'synthetic_ER_10_20',
-           'synthetic_ER_20_24', 'synthetic_ER_20_30', 'synthetic_ER_20_40',
-           'synthetic_ER_30_36', 'synthetic_ER_30_45', 'synthetic_ER_30_60']
+    # BNs = ['synthetic_ER_10_12', 'synthetic_ER_10_15', 'synthetic_ER_10_20',
+    #        'synthetic_ER_20_24', 'synthetic_ER_20_30', 'synthetic_ER_20_40',
+    #        'synthetic_ER_30_36', 'synthetic_ER_30_45', 'synthetic_ER_30_60']
 
     crit_dicts = [{crit_k: crit_v for crit_k, crit_v in zip(crits.keys(), crit_vs)}
                   for crit_vs in itertools.product(*[crits[k] for k in crits.keys()])]
@@ -174,7 +182,10 @@ def new_correction_draw(results_dir, K):
                 print(f'skip {BN}')
                 continue
             shift = 0
-            # max_y = 0
+
+            # to remove
+            max_y = 1
+
             for crit_dict in crit_dicts:
                 df_crit = select_df
                 for crit_k, crit_v in crit_dict.items():

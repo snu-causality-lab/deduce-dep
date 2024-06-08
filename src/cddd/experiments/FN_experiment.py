@@ -1,4 +1,5 @@
 import random
+import numpy as np
 import pandas as pd
 import networkx as nx
 from collections import Counter
@@ -48,6 +49,7 @@ def __fn_experiment_core(working_dir, num_vars, time_vars, sampling_number, alph
 
     # randomly check conditional independence from sample and d-separation, 0 <= ... <=N-2
     for _ in range(20):
+        np.random.seed(42)
         Zs = set(choice(num_vars, randint(2, min(5, num_vars - 1)), replace=False))
         X, Y, *_ = shuffled(set(true_graph.nodes) - Zs)
 

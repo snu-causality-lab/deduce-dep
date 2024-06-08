@@ -12,6 +12,7 @@ def pc_stable(data, alpha, reliability_criterion='classic', is_orientation=False
     adj_mat = [[1 if i != j else 0 for j in range(num_of_variables)] for i in range(num_of_variables)]
     sepsets = dict()
     consets = dict()
+    sepsets_for_orientation = dict()
 
     add_ci_set = []
     ci_number = 0
@@ -32,6 +33,7 @@ def pc_stable(data, alpha, reliability_criterion='classic', is_orientation=False
                             if is_deductive_reasoning:
                                 if not deduce_dep(data, target, candidate, cond_set, K, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester):
                                     sepsets[tuple(sorted([target, candidate]))] = cond_set
+                                    sepsets_for_orientation[tuple(sorted([target, candidate]))] = cond_set
                                     marker.append([tuple(sorted([target, candidate])), cond_set])
                                     break
                                 else:
@@ -39,6 +41,7 @@ def pc_stable(data, alpha, reliability_criterion='classic', is_orientation=False
 
                             else:
                                 sepsets[tuple(sorted([target, candidate]))] = cond_set
+                                sepsets_for_orientation[tuple(sorted([target, candidate]))] = cond_set
                                 marker.append([tuple(sorted([target, candidate])), cond_set])
                                 break
                         else:
@@ -56,6 +59,6 @@ def pc_stable(data, alpha, reliability_criterion='classic', is_orientation=False
     else:
         adj_mat = np.array(adj_mat)
         skel_graph = nx.DiGraph(adj_mat)
-        dag = estimate_cpdag(skel_graph, sepsets)
+        dag = estimate_cpdag(skel_graph, sepsets_for_orientation)
         adj_mat = nx.to_numpy_array(dag)
         return adj_mat, sepsets, ci_number

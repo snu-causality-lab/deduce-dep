@@ -258,8 +258,8 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         data = load_data(path, m)
 
         start_time = time.time()
-        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion=reliability_criterion, is_orientation=True, K=K,
-                                                      ci_tester=ci_tester)
+        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion=reliability_criterion,
+                                                      is_orientation=True, K=K, ci_tester=ci_tester)
         end_time = time.time()
         time_lapsed = end_time - start_time
 
@@ -267,8 +267,11 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
                                                                                             estim_adj_mat)
 
         oracle_CPDAG_adj_mat = DAG_to_CPDAG(oracle_adj_mat)
-        estim_CPDAG_adj_mat = DAG_to_CPDAG(estim_adj_mat)
-        SHD = get_SHD(oracle_CPDAG_adj_mat, estim_CPDAG_adj_mat)
+
+        SHD = get_SHD(oracle_CPDAG_adj_mat, estim_adj_mat)
+
+        # estim_CPDAG_adj_mat = DAG_to_CPDAG(estim_adj_mat)
+        # SHD = get_SHD(oracle_CPDAG_adj_mat, estim_CPDAG_adj_mat)
 
         adj_accuracies.append(adj_accuracy)
         adj_precisions.append(adj_precision)
