@@ -21,29 +21,28 @@ T = TypeVar('T')
 H = TypeVar('H', bound=Hashable)
 
 
-def sample_synthetic_dataset(num_vars, edge_ratio, num_sampling, size, working_dir, seed=None):
+def sample_synthetic_dataset(num_vars, edge_ratio, sampling_number, size, working_dir, seed=None):
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
 
     num_edges = int(num_vars * edge_ratio)
-    BN_name = f'synthetic_ER_{num_vars}_{num_edges}'
-    for i in range(1, num_sampling + 1):
-        # randomly generate a Bayesian network
-        bn = random_BN(num_vars, num_edges)
+    BN_name = f'synthetic_ER_{num_vars}_{num_edges}_{sampling_number}'
 
-        # save ground truth file
-        adj_mat = nx.adjacency_matrix(bn.G)
-        adj_mat = adj_mat.todense()
-        adj_mat_df = pd.DataFrame(adj_mat, columns=[i for i in range(num_vars)])
-        adj_mat_df_path = f'{working_dir}/data/Ground_truth/{BN_name}_true.txt'
-        adj_mat_df.to_csv(adj_mat_df_path, sep=" ", header=None, index=False)
+    # randomly generate a Bayesian network
+    bn = random_BN(num_vars, num_edges)
 
-        # random sample
-        sampled_data = bn.sample(size)
-        # sampled_data_path = f'{working_dir}/data/Sampled_datasets/{BN_name}_' + str(size) + '_v' + str(i) + '.csv'
-        sampled_data_path = f'{working_dir}/data/Sampled_datasets/{BN_name}_{size}_v{i}.csv'
-        sampled_data.to_csv(sampled_data_path, index=False)
+    # save ground truth file
+    adj_mat = nx.adjacency_matrix(bn.G)
+    adj_mat = adj_mat.todense()
+    adj_mat_df = pd.DataFrame(adj_mat, columns=[i for i in range(num_vars)])
+    adj_mat_df_path = f'{working_dir}/data/Ground_truth/{BN_name}_true.txt'
+    adj_mat_df.to_csv(adj_mat_df_path, sep=" ", header=None, index=False)
+
+    # sample data
+    sampled_data = bn.sample(size)
+    sampled_data_path = f'{working_dir}/data/Sampled_datasets/{BN_name}_{size}_v1.csv'
+    sampled_data.to_csv(sampled_data_path, index=False)
 
 
 def sample_ER_dataset(num_vars, edge_ratio, num_sampling, size, working_dir, seed=None):
@@ -251,61 +250,61 @@ if __name__ == '__main__':
 
     nums_vars = (10, 20, 30)
     edge_ratios = (1.2, 1.5, 2)
-    num_sampling = 30
+    num_sampling = 50
     dataset_sizes = (200, 500, 1000, 2000)
 
     # generate data for BNLearn models
-    print('generating datasets for known BNLearn graphs...')
-    BIF_BNs = ('alarm', 'asia', 'child', 'insurance', 'sachs', 'water')
-    for bif_bn in BIF_BNs:
-        print(f'    {bif_bn} ... ')
-        sample_from_bif(WORKING_DIR, bif_bn, dataset_sizes, num_sampling)
+    # print('generating datasets for known BNLearn graphs...')
+    # BIF_BNs = ('alarm', 'asia', 'child', 'insurance', 'sachs', 'water')
+    # for bif_bn in BIF_BNs:
+    #     print(f'    {bif_bn} ... ')
+    #     sample_from_bif(WORKING_DIR, bif_bn, dataset_sizes, num_sampling)
 
-    print('generating new-style random datasets.')  # post-submission
-    # generate data for Erdos-Renyi
-    Parallel(n_jobs=multiprocessing.cpu_count())(
-        delayed(sample_ER_dataset)(
-            num_vars, edge_ratio, num_sampling, size, WORKING_DIR, seed=i)
-        for i, (num_vars, edge_ratio, size)
-        in enumerate(product(nums_vars, edge_ratios, dataset_sizes))
-    )
+    # print('generating new-style random datasets.')  # post-submission
+    # # generate data for Erdos-Renyi
+    # Parallel(n_jobs=multiprocessing.cpu_count())(
+    #     delayed(sample_ER_dataset)(
+    #         num_vars, edge_ratio, num_sampling, size, WORKING_DIR, seed=i)
+    #     for i, (num_vars, edge_ratio, size)
+    #     in enumerate(product(nums_vars, edge_ratios, dataset_sizes))
+    # )
 
     print('generating previous style random datasets.')  # in the submission
     # generate data for Erdos-Renyi (previous version)
     Parallel(n_jobs=multiprocessing.cpu_count())(
         delayed(sample_synthetic_dataset)(
-            num_vars, edge_ratio, num_sampling, size, WORKING_DIR, seed=i)
-        for i, (num_vars, edge_ratio, size)
-        in enumerate(product(nums_vars, edge_ratios, dataset_sizes))
+            num_vars, edge_ratio, sampling_number, size, WORKING_DIR, seed=i)
+        for i, (num_vars, edge_ratio, sampling_number, size)
+        in enumerate(product(nums_vars, edge_ratios, [i for i in range(num_sampling)], dataset_sizes))
     )
 
     edge_ratios = (1.8, 3.2)
     edges_to_attach = (2, 4)  # for scale-free networks
     dataset_sizes = (30, 50, 100, 150)
 
-    print('generating linear SEM datasets.')  # post-submission : Linear SEM ER
-    # generate data from linear SEM
-    Parallel(n_jobs=multiprocessing.cpu_count())(
-        delayed(sample_linear_sem)(
-            num_vars, edge_ratio, num_sampling, size, WORKING_DIR, seed=i)
-        for i, (num_vars, edge_ratio, size)
-        in enumerate(product(nums_vars, edge_ratios, dataset_sizes))
-    )
-
-    print('generating nonlinear SEM datasets.')  # post-submission : Linear SEM
-    # generate data from nonlinear SEM (using MLP)
-    Parallel(n_jobs=multiprocessing.cpu_count())(
-        delayed(sample_nonlinear_sem)(
-            num_vars, edge_ratio, num_sampling, size, WORKING_DIR, seed=i)
-        for i, (num_vars, edge_ratio, size)
-        in enumerate(product(nums_vars, edge_ratios, dataset_sizes))
-    )
-
-    print('generating linear SEM SF datasets.')  # post-submission : Linear SEM SF
-    # generate data from linear SEM SF version
-    Parallel(n_jobs=multiprocessing.cpu_count())(
-        delayed(sample_linear_sem_sf)(
-            num_vars, edge_to_attach, num_sampling, size, WORKING_DIR, seed=i)
-        for i, (num_vars, edge_to_attach, size)
-        in enumerate(product(nums_vars, edges_to_attach, dataset_sizes))
-    )
+    # print('generating linear SEM datasets.')  # post-submission : Linear SEM ER
+    # # generate data from linear SEM
+    # Parallel(n_jobs=multiprocessing.cpu_count())(
+    #     delayed(sample_linear_sem)(
+    #         num_vars, edge_ratio, num_sampling, size, WORKING_DIR, seed=i)
+    #     for i, (num_vars, edge_ratio, size)
+    #     in enumerate(product(nums_vars, edge_ratios, dataset_sizes))
+    # )
+    #
+    # print('generating nonlinear SEM datasets.')  # post-submission : Linear SEM
+    # # generate data from nonlinear SEM (using MLP)
+    # Parallel(n_jobs=multiprocessing.cpu_count())(
+    #     delayed(sample_nonlinear_sem)(
+    #         num_vars, edge_ratio, num_sampling, size, WORKING_DIR, seed=i)
+    #     for i, (num_vars, edge_ratio, size)
+    #     in enumerate(product(nums_vars, edge_ratios, dataset_sizes))
+    # )
+    #
+    # print('generating linear SEM SF datasets.')  # post-submission : Linear SEM SF
+    # # generate data from linear SEM SF version
+    # Parallel(n_jobs=multiprocessing.cpu_count())(
+    #     delayed(sample_linear_sem_sf)(
+    #         num_vars, edge_to_attach, num_sampling, size, WORKING_DIR, seed=i)
+    #     for i, (num_vars, edge_to_attach, size)
+    #     in enumerate(product(nums_vars, edges_to_attach, dataset_sizes))
+    # )
