@@ -1,8 +1,25 @@
 import os
 from typing import List
+from itertools import combinations
 
+import networkx as nx
 import pandas as pd
 from filelock import FileLock
+
+def DAG_to_CPDAG(adj_mat):
+    GT = nx.DiGraph(adj_mat)
+    nodes = list(GT.nodes)
+    rtn_adj_mat = adj_mat + adj_mat.T
+
+    for a, b in combinations(nodes, r=2):
+        if (not rtn_adj_mat[a][b]) and (not rtn_adj_mat[b][a]):
+            common_child = set(GT.successors(a)) & set(GT.successors(b))
+            for child in common_child:
+                rtn_adj_mat[a][child] = 1
+                rtn_adj_mat[child][a] = 0
+                rtn_adj_mat[b][child] = 1
+                rtn_adj_mat[child][b] = 0
+    return rtn_adj_mat
 
 
 def safe_save_to_csv(result: List[List], columns: List[str], file_path: str):

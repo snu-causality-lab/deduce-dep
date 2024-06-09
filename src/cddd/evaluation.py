@@ -11,6 +11,7 @@ from cddd.algos.HITON_PC_with_CI_ORACLE import HITON_PC_oracle
 from cddd.algos.PC_STABLE import pc_stable
 from cddd.algos.PC_STABLE_with_CI_ORACLE import pc_stable_oracle
 from cddd.correction import correction
+from cddd.utils import DAG_to_CPDAG
 
 
 def local_metric_evaluation(Distance, F1, Precision, Recall, ResPC, realpc, target_list):
@@ -76,21 +77,6 @@ def global_skeleton_metric_evaluation(true_adj_mat, estim_adj_mat):
 
     return accuracy, precision, recall, f1
 
-
-def DAG_to_CPDAG(adj_mat):
-    GT = nx.DiGraph(adj_mat)
-    nodes = list(GT.nodes)
-    adj_mat = adj_mat + adj_mat.T
-
-    for a, b in combinations(nodes, r=2):
-        if (not adj_mat[a][b]) and (not adj_mat[b][a]):
-            common_child = set(GT.successors(a)) & set(GT.successors(b))
-            for child in common_child:
-                adj_mat[a][child] = 1
-                adj_mat[child][a] = 0
-                adj_mat[b][child] = 1
-                adj_mat[child][b] = 0
-    return adj_mat
 
 
 def get_SHD(oracle_adj_mat, estim_adj_mat):
@@ -252,7 +238,7 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
     CI_numbers = []
     Times = []
 
-    oracle_adj_mat = get_oracle_adj_mat(path, real_graph_path)
+    oracle_adj_mat = get_oracle_adj_mat(path, real_graph_path, is_orientation=True)
 
     for m in range(filenumber):
         data = load_data(path, m)
@@ -266,12 +252,10 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         adj_accuracy, adj_precision, adj_recall, adj_f1 = global_skeleton_metric_evaluation(oracle_adj_mat,
                                                                                             estim_adj_mat)
 
+        estim_CPDAG_adj_mat = DAG_to_CPDAG(estim_adj_mat)
         oracle_CPDAG_adj_mat = DAG_to_CPDAG(oracle_adj_mat)
+        SHD = get_SHD(oracle_CPDAG_adj_mat, estim_CPDAG_adj_mat)
 
-        SHD = get_SHD(oracle_CPDAG_adj_mat, estim_adj_mat)
-
-        # estim_CPDAG_adj_mat = DAG_to_CPDAG(estim_adj_mat)
-        # SHD = get_SHD(oracle_CPDAG_adj_mat, estim_CPDAG_adj_mat)
 
         adj_accuracies.append(adj_accuracy)
         adj_precisions.append(adj_precision)
@@ -297,13 +281,13 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         SHDs_std, CI_numbers_std, Times_std
 
 
-def get_oracle_adj_mat(path, real_graph_path):
+def get_oracle_adj_mat(path, real_graph_path, is_orientation = True):
     examplePath = path + str(1) + ".csv"
     _data = pd.read_csv(examplePath)
     number, all_number_Para = np.shape(_data)
     true_adj_mat = get_adj_mat(all_number_Para, real_graph_path)
     true_graph = nx.DiGraph(true_adj_mat)
-    oracle_adj_mat = pc_stable_oracle(true_adj_mat, true_graph, is_orientation=True)
+    oracle_adj_mat = pc_stable_oracle(true_adj_mat, true_graph, is_orientation=is_orientation)
     return oracle_adj_mat
 
 

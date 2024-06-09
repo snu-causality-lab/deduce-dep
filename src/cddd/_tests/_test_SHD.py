@@ -1,6 +1,7 @@
 import numpy as np
 
-from cddd.evaluation import DAG_to_CPDAG, get_SHD
+from cddd.evaluation import get_SHD
+from cddd.utils import DAG_to_CPDAG
 
 if __name__ == '__main__':
     # 0->1->2
