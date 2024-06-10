@@ -1,64 +1,71 @@
 import random
-import numpy as np
-import pandas as pd
-import networkx as nx
 from collections import Counter
 
+import networkx as nx
+import numpy as np
+import pandas as pd
 from numpy.random import randint, choice
 
 from cddd.cit import ci_test_factory
 from cddd.deductive_reasoning import deduce_dep
 from cddd.evaluation import get_adj_mat
-from cddd.sampling import random_BN, shuffled
+from cddd.sampling import shuffled
 from cddd.utils import safe_save_to_csv
 
 
-def fn_experiment(working_dir, num_vars, time_vars, sampling_number, alpha, dataset_size):
-    __fn_experiment_core(working_dir, num_vars, time_vars, sampling_number, alpha, dataset_size)
-
-
-def __fn_experiment_core(working_dir, num_vars, time_vars, sampling_number, alpha, dataset_size):
-    assert alpha in {0.01, 0.05}
-    alpha_str = {0.01: '001', 0.05: '005'}
+def new_correction_experiment(BN, alpha, K, ci_tester_name, working_dir, dataset_size, sample_id):
     # experiments settings
-    ci_tester = ci_test_factory('G2')
+    random.seed(0)
+    ci_tester = ci_test_factory(ci_tester_name)
+
     # experiment results
-    columns = ['num_vars', 'num_edges', 'data_set_size', 'is_deductive_reasoning',
+    columns = ['BN', 'data_set_size', 'is_deductive_reasoning',
                'Accuracy', 'Precision', 'Recall', 'F1']
     result = []
 
-    num_edges = int(time_vars * num_vars)
-    random.seed(0)
+    real_graph_path = f"{working_dir}/data/Ground_truth/{BN}_true.txt"
+    data_path = f"{working_dir}/data/Sampled_datasets/{BN}_{dataset_size}_v"
+    data = pd.read_csv(data_path + '1.csv')
+    number_of_data, num_vars = np.shape(data)
 
-    # get ground truth graph
-    BN_name = f'synthetic_ER_{num_vars}_{num_edges}_{sampling_number}'
-    real_graph_path = working_dir + f'/data/Ground_truth/{BN_name}_true.txt'
     true_adj_mat = get_adj_mat(num_vars, real_graph_path)
     true_graph = nx.DiGraph(true_adj_mat)
 
-    # get sampled_data
-    data = pd.read_csv(working_dir + f'/data/Sampled_datasets/{BN_name}_{dataset_size}_v1.csv')
+    completePath = data_path + str(sample_id) + ".csv"
+    data = pd.read_csv(completePath)
+    number_of_data, num_vars = np.shape(data)
+    data.columns = [i for i in range(num_vars)]
 
+    result_mth = __new_correction_experiment_core(BN, K, alpha, data, num_vars, dataset_size, true_graph, 20, ci_tester=ci_tester)
+
+    result.extend(result_mth)
+
+    # write and save the experiment result as a csv file
+    result_file_path = f'{working_dir}/results/new_corr_result_{alpha}_{K}.csv'
+    safe_save_to_csv(result, columns, result_file_path)
+    # print(f'new_fn_experiment {(BN, alpha, K, ci_tester_name, working_dir, dataset_size, sample_id)}')
+
+
+def __new_correction_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, n_repeats=20, ci_tester=None):
+    result_mth = []
     sepsets = dict()
     consets = dict()
     add_ci_set = []
-
-    results_stat = []  # type:
+    results_stat = []
     results_deduce = []
     results_all = []
-
     # randomly check conditional independence from sample and d-separation, 0 <= ... <=N-2
-    for _ in range(20):
-        np.random.seed(42)
+    for _ in range(n_repeats):
+        Vs = set([i for i in range(num_vars)])
         Zs = set(choice(num_vars, randint(2, min(5, num_vars - 1)), replace=False))
-        X, Y, *_ = shuffled(set(true_graph.nodes) - Zs)
+        X, Y, *_ = shuffled(Vs - Zs)
 
         truth = nx.d_separated(true_graph, {X}, {Y}, Zs)
         pval, _ = ci_tester.ci_test(data, X, Y, list(Zs))
         stat_estim = (pval > alpha)
 
         if pval > alpha:
-            deduce_estim = not (deduce_dep(data, X, Y, list(Zs), 1, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester))
+            deduce_estim = not (deduce_dep(data, X, Y, list(Zs), K, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester))
         else:
             deduce_estim = False
 
@@ -89,10 +96,7 @@ def __fn_experiment_core(working_dir, num_vars, time_vars, sampling_number, alph
 
         is_deductive_reasoning = (i != 0)
 
-        new_row = [num_vars, num_edges, dataset_size, is_deductive_reasoning,
+        new_row = [BN, size_of_sampled_dataset, is_deductive_reasoning,
                    accuracy, precision, recall, f1]
-        result.append(new_row)
-
-    # write and save the experiment result as a csv file
-    result_file_path = f'{working_dir}/results/fn_result_alpha_{alpha_str[alpha]}.csv'
-    safe_save_to_csv(result, columns, result_file_path)
+        result_mth.append(new_row)
+    return result_mth

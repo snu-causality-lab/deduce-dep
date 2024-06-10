@@ -21,8 +21,8 @@ from matplotlib.ticker import FormatStrFormatter
 def correction_draw(result_dir):
     REPORTING_CONFIDENCE_INTERVAL = True
 
-    df_fn_001 = pd.read_csv(result_dir + '/fn_result_alpha_001.csv')
-    df_fn_005 = pd.read_csv(result_dir + '/fn_result_alpha_005.csv')
+    df_fn_001 = pd.read_csv(result_dir + '/corr_result_alpha_001.csv')
+    df_fn_005 = pd.read_csv(result_dir + '/corr_result_alpha_005.csv')
     df_fn_001['alpha'] = 0.01
     df_fn_005['alpha'] = 0.05
     df = pd.concat([df_fn_001, df_fn_005], ignore_index=True)
@@ -123,15 +123,15 @@ def correction_draw(result_dir):
         sns.despine(fig)
         fig.tight_layout()
         if REPORTING_CONFIDENCE_INTERVAL:
-            fig.savefig(results_dir + f'/fn_{metric}_CI95.pdf', bbox_inches='tight', pad_inches=0.02)
+            fig.savefig(results_dir + f'/corr_{metric}_CI95.pdf', bbox_inches='tight', pad_inches=0.02)
         else:
-            fig.savefig(results_dir + f'/fn_{metric}_stdev.pdf', bbox_inches='tight', pad_inches=0.02)
+            fig.savefig(results_dir + f'/corr_{metric}_stdev.pdf', bbox_inches='tight', pad_inches=0.02)
 
 def new_correction_draw(results_dir, K):
     REPORTING_CONFIDENCE_INTERVAL = True
 
-    df_fn_005 = pd.read_csv(results_dir + f'/new_fn_result_0.05_{K}.csv')
-    df_fn_001 = pd.read_csv(results_dir + f'/new_fn_result_0.01_{K}.csv')
+    df_fn_005 = pd.read_csv(results_dir + f'/new_corr_result_0.05_{K}.csv')
+    df_fn_001 = pd.read_csv(results_dir + f'/new_corr_result_0.01_{K}.csv')
     df_fn_001['alpha'] = 0.01
     df_fn_005['alpha'] = 0.05
     df = pd.concat([df_fn_001, df_fn_005], ignore_index=True)
@@ -241,9 +241,9 @@ def new_correction_draw(results_dir, K):
         sns.despine(fig)
         fig.tight_layout()
         if REPORTING_CONFIDENCE_INTERVAL:
-            fig.savefig(results_dir + f'/new_fn_{metric}_CI95_{K}.pdf', bbox_inches='tight', pad_inches=0.02)
+            fig.savefig(results_dir + f'/new_corr_{metric}_CI95_{K}.pdf', bbox_inches='tight', pad_inches=0.02)
         else:
-            fig.savefig(results_dir + f'/new_fn_{metric}_stdev_{K}.pdf', bbox_inches='tight', pad_inches=0.02)
+            fig.savefig(results_dir + f'/new_corr_{metric}_stdev_{K}.pdf', bbox_inches='tight', pad_inches=0.02)
 
 
 def data_preprocessing(df_algo):
@@ -414,13 +414,13 @@ if __name__ == '__main__':
 
     # draw for performance experiment
     # drop_duplicates(results_dir)
-    for K in [0, 1, 2]:
-        create_all_algo(results_dir, K)
-        draw_for_perf_experiments(results_dir, K, repeated=30)
+    # for K in [0, 1, 2]:
+    #     create_all_algo(results_dir, K)
+    #     draw_for_perf_experiments(results_dir, K, repeated=30)
 
     # draw for correction experiment
     correction_draw(results_dir)
 
     # draw for new correction experiment
-    # for K in [0, 1, 2]:
-    #     new_correction_draw(results_dir, K)
+    for K in [1,]:
+        new_correction_draw(results_dir, K)
