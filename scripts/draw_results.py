@@ -414,10 +414,9 @@ if __name__ == '__main__':
 
     # draw for performance experiment
     # drop_duplicates(results_dir)
-    # for K in [0, 1, 2]:
-    #     create_all_algo(results_dir, K)
-    #     # TODO previous version used 10 samples, now 30, please change repeated accordingly (for correct confidence intervals)
-    #     draw_for_perf_experiments(results_dir, K, repeated=30)
+    for K in [0, 1, 2]:
+        create_all_algo(results_dir, K)
+        draw_for_perf_experiments(results_dir, K, repeated=30)
 
     # draw for correction experiment
     correction_draw(results_dir)

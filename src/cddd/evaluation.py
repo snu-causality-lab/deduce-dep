@@ -180,7 +180,6 @@ def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, relia
     _, all_number_Para = np.shape(pd.read_csv(path + str(1) + ".csv"))
 
     true_graph = nx.DiGraph(true_adj_mat := get_adj_mat(all_number_Para, real_graph_path))
-    # TODO (replace) just adjacency matrix for skeleton,
     oracle_adj_mat = pc_stable_oracle(true_adj_mat, true_graph)
 
     for m in range(filenumber):
@@ -255,7 +254,6 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
         estim_CPDAG_adj_mat = DAG_to_CPDAG(estim_adj_mat)
         oracle_CPDAG_adj_mat = DAG_to_CPDAG(oracle_adj_mat)
         SHD = get_SHD(oracle_CPDAG_adj_mat, estim_CPDAG_adj_mat)
-
 
         adj_accuracies.append(adj_accuracy)
         adj_precisions.append(adj_precision)

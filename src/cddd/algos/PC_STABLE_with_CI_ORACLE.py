@@ -4,7 +4,7 @@ import networkx as nx
 import numpy as np
 
 from cddd.algos.algo_utils import estimate_cpdag
-from cddd.utils import DAG_to_CPDAG
+
 
 def pc_stable_oracle(true_adj_mat, true_graph, is_orientation=False):
     if not is_orientation:
@@ -43,5 +43,4 @@ def pc_stable_oracle(true_adj_mat, true_graph, is_orientation=False):
     adj_mat = nx.to_numpy_array(dag)
 
     return adj_mat
-
 
