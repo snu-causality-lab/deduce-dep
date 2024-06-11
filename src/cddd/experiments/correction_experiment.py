@@ -28,7 +28,6 @@ def __correction_experiment_core(working_dir, num_vars, time_vars, sampling_numb
     result = []
 
     num_edges = int(time_vars * num_vars)
-    random.seed(0)
 
     # get ground truth graph
     BN_name = f'synthetic_ER_{num_vars}_{num_edges}_{sampling_number}'
@@ -48,8 +47,8 @@ def __correction_experiment_core(working_dir, num_vars, time_vars, sampling_numb
     results_all = []
 
     # randomly check conditional independence from sample and d-separation, 0 <= ... <=N-2
+    np.random.seed(20)
     for _ in range(20):
-        np.random.seed(42)
         Zs = set(choice(num_vars, randint(2, min(5, num_vars - 1)), replace=False))
         X, Y, *_ = shuffled(set(true_graph.nodes) - Zs)
 

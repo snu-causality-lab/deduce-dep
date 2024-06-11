@@ -30,8 +30,8 @@ def performance_experiment(BN, size_of_sampled_dataset, sampling_number, algo, c
 
     elif algo == 'PC':
         for reliability_criterion in reliability_criterions:
-            outs = pc_stable_evaluation(data_path, real_graph_path, file_number, alpha, reliability_criterion, K=K,
-                                        ci_tester=ci_tester)
+            outs = pc_stable_evaluation(data_path, real_graph_path, file_number, alpha, reliability_criterion,
+                                        K=K, ci_tester=ci_tester)
             result.append([BN, size_of_sampled_dataset, reliability_criterion, *outs])
 
     result_file_path = f'{working_dir}/results/{algo}_result_{alpha}_{K}.csv'

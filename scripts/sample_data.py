@@ -250,15 +250,15 @@ if __name__ == '__main__':
 
     nums_vars = (10, 20, 30)
     edge_ratios = (1.2, 1.5, 2)
-    num_sampling = 30
+    num_sampling = 50
     dataset_sizes = (200, 500, 1000, 2000)
 
     # generate data for BNLearn models
-    print('generating datasets for known BNLearn graphs...')
-    BIF_BNs = ('alarm', 'asia', 'child', 'insurance', 'sachs', 'water')
-    for bif_bn in BIF_BNs:
-        print(f'    {bif_bn} ... ')
-        sample_from_bif(WORKING_DIR, bif_bn, dataset_sizes, num_sampling)
+    # print('generating datasets for known BNLearn graphs...')
+    # BIF_BNs = ('alarm', 'asia', 'child', 'insurance', 'sachs', 'water')
+    # for bif_bn in BIF_BNs:
+    #     print(f'    {bif_bn} ... ')
+    #     sample_from_bif(WORKING_DIR, bif_bn, dataset_sizes, num_sampling)
 
     # print('generating new-style random datasets.')  # post-submission
     # # generate data for Erdos-Renyi
@@ -271,12 +271,12 @@ if __name__ == '__main__':
 
     # print('generating previous style random datasets.')  # in the submission
     # # generate data for Erdos-Renyi (previous version)
-    # Parallel(n_jobs=multiprocessing.cpu_count())(
-    #     delayed(sample_synthetic_dataset)(
-    #         num_vars, edge_ratio, sampling_number, size, WORKING_DIR, seed=i)
-    #     for i, (num_vars, edge_ratio, sampling_number, size)
-    #     in enumerate(product(nums_vars, edge_ratios, [i for i in range(num_sampling)], dataset_sizes))
-    # )
+    Parallel(n_jobs=multiprocessing.cpu_count())(
+        delayed(sample_synthetic_dataset)(
+            num_vars, edge_ratio, sampling_number, size, WORKING_DIR, seed=i*29)
+        for i, (num_vars, edge_ratio, sampling_number, size)
+        in enumerate(product(nums_vars, edge_ratios, [i for i in range(num_sampling)], dataset_sizes))
+    )
 
     edge_ratios = (1.8, 3.2)
     edges_to_attach = (2, 4)  # for scale-free networks
