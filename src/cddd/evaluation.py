@@ -237,7 +237,6 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
     Times = []
 
     oracle_adj_mat = get_oracle_adj_mat(path, real_graph_path, is_orientation=is_orientation)
-
     for m in range(filenumber):
         data = load_data(path, m)
 
@@ -249,10 +248,6 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
 
         adj_accuracy, adj_precision, adj_recall, adj_f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
         SHD = get_SHD(oracle_adj_mat, estim_adj_mat)
-        if is_orientation:
-            oracle_CPDAG_adj_mat = DAG_to_CPDAG(oracle_adj_mat)
-            estim_CPDAG_adj_mat = DAG_to_CPDAG(estim_adj_mat)
-            SHD = get_SHD(oracle_CPDAG_adj_mat, estim_adj_mat)
 
         adj_accuracies.append(adj_accuracy)
         adj_precisions.append(adj_precision)

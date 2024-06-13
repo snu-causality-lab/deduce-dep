@@ -254,11 +254,11 @@ if __name__ == '__main__':
     dataset_sizes = (200, 500, 1000, 2000)
 
     # generate data for BNLearn models
-    # print('generating datasets for known BNLearn graphs...')
-    # BIF_BNs = ('alarm', 'asia', 'child', 'insurance', 'sachs', 'water')
-    # for bif_bn in BIF_BNs:
-    #     print(f'    {bif_bn} ... ')
-    #     sample_from_bif(WORKING_DIR, bif_bn, dataset_sizes, num_sampling)
+    print('generating datasets for known BNLearn graphs...')
+    BIF_BNs = ('alarm', 'asia', 'child', 'insurance', 'sachs', 'water')
+    for bif_bn in BIF_BNs:
+        print(f'    {bif_bn} ... ')
+        sample_from_bif(WORKING_DIR, bif_bn, dataset_sizes, num_sampling)
 
     # print('generating new-style random datasets.')  # post-submission
     # # generate data for Erdos-Renyi

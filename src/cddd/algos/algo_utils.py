@@ -39,7 +39,7 @@ def estimate_cpdag(skel_graph, sep_set):
                     dag.remove_edge(k, j)
 
     # directly modifies the dag
-    apply_meeks_rule(dag)
+    # apply_meeks_rule(dag)
 
     return dag
 
