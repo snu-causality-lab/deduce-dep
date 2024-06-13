@@ -3,10 +3,12 @@ from typing import List
 from itertools import combinations
 
 import networkx as nx
+import numpy as np
 import pandas as pd
 from filelock import FileLock
 
 def DAG_to_CPDAG(adj_mat):
+    adj_mat = np.array(adj_mat)
     GT = nx.DiGraph(adj_mat)
     nodes = list(GT.nodes)
     rtn_adj_mat = adj_mat + adj_mat.T

@@ -273,7 +273,7 @@ if __name__ == '__main__':
     # # generate data for Erdos-Renyi (previous version)
     Parallel(n_jobs=multiprocessing.cpu_count())(
         delayed(sample_synthetic_dataset)(
-            num_vars, edge_ratio, sampling_number, size, WORKING_DIR, seed=i*29)
+            num_vars, edge_ratio, sampling_number, size, WORKING_DIR, seed=i*19)
         for i, (num_vars, edge_ratio, sampling_number, size)
         in enumerate(product(nums_vars, edge_ratios, [i for i in range(num_sampling)], dataset_sizes))
     )

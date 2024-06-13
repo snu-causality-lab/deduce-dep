@@ -288,7 +288,6 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
     # df = pd.read_csv(WORK_DIR + 'all_algo.csv')
     df = pd.read_csv(results_dir + f'/all_algo_{K}.csv')
     algos = ['HITON-PC', 'PC']
-    # networks = ['ER_10_12', 'ER_10_15', 'ER_10_20', 'ER_20_24', 'ER_20_30', 'ER_20_40', 'ER_30_36', 'ER_30_45', 'ER_30_60']
     networks = ['alarm', 'sachs', 'insurance', 'asia', 'child', 'water']
     alphas = [0.01, 0.05]
     # criteria = {'algo': algos, 'BN': networks, 'alpha': alphas}
@@ -408,8 +407,8 @@ if __name__ == '__main__':
         draw_for_perf_experiments(results_dir, K, repeated=30)
 
     # draw for correction experiment
-    correction_draw(results_dir)
+    # correction_draw(results_dir)
 
     # draw for new correction experiment
-    for K in [1,]:
-        new_correction_draw(results_dir, K)
+    # for K in [1,]:
+    #     new_correction_draw(results_dir, K)

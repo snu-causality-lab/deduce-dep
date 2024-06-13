@@ -81,7 +81,6 @@ def global_skeleton_metric_evaluation(true_adj_mat, estim_adj_mat):
 
 def get_SHD(oracle_adj_mat, estim_adj_mat):
     # DAG -> CPDAG
-
     diff = np.abs(oracle_adj_mat - estim_adj_mat)
     diff = diff + diff.transpose()
     diff[diff > 1] = 1
@@ -226,7 +225,7 @@ def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, relia
 
 
 def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic',
-                                  K=1, ci_tester=None):
+                                  K=1, ci_tester=None, is_orientation = False):
     # pre_set variables are zero
     adj_accuracies = []
     adj_f1s = []
@@ -237,23 +236,23 @@ def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.
     CI_numbers = []
     Times = []
 
-    oracle_adj_mat = get_oracle_adj_mat(path, real_graph_path, is_orientation=True)
+    oracle_adj_mat = get_oracle_adj_mat(path, real_graph_path, is_orientation=is_orientation)
 
     for m in range(filenumber):
         data = load_data(path, m)
 
         start_time = time.time()
         estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion=reliability_criterion,
-                                                      is_orientation=True, K=K, ci_tester=ci_tester)
+                                                      is_orientation=is_orientation, K=K, ci_tester=ci_tester)
         end_time = time.time()
         time_lapsed = end_time - start_time
 
-        adj_accuracy, adj_precision, adj_recall, adj_f1 = global_skeleton_metric_evaluation(oracle_adj_mat,
-                                                                                            estim_adj_mat)
-
-        estim_CPDAG_adj_mat = DAG_to_CPDAG(estim_adj_mat)
-        oracle_CPDAG_adj_mat = DAG_to_CPDAG(oracle_adj_mat)
-        SHD = get_SHD(oracle_CPDAG_adj_mat, estim_CPDAG_adj_mat)
+        adj_accuracy, adj_precision, adj_recall, adj_f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
+        SHD = get_SHD(oracle_adj_mat, estim_adj_mat)
+        if is_orientation:
+            oracle_CPDAG_adj_mat = DAG_to_CPDAG(oracle_adj_mat)
+            estim_CPDAG_adj_mat = DAG_to_CPDAG(estim_adj_mat)
+            SHD = get_SHD(oracle_CPDAG_adj_mat, estim_adj_mat)
 
         adj_accuracies.append(adj_accuracy)
         adj_precisions.append(adj_precision)

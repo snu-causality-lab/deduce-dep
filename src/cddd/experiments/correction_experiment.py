@@ -18,6 +18,20 @@ def correction_experiment(working_dir, num_vars, time_vars, sampling_number, alp
 
 
 def __correction_experiment_core(working_dir, num_vars, time_vars, sampling_number, alpha, dataset_size):
+    """
+    Execute correction experiment.
+
+    Args:
+        working_dir: working directory
+        num_vars: number of variables in random DAG
+        time_vars: the ratio of the number of edges to the number of variables (|E| / |V|)
+        sampling_number: the total number of sampled random DAG
+        alpha: the significance level for conditional independence test (CIT)
+        dataset_size: size of sampled dataset sizes
+
+    Returns:
+
+    """
     assert alpha in {0.01, 0.05}
     alpha_str = {0.01: '001', 0.05: '005'}
     # experiments settings
@@ -57,7 +71,7 @@ def __correction_experiment_core(working_dir, num_vars, time_vars, sampling_numb
         stat_estim = (pval > alpha)
 
         if pval > alpha:
-            deduce_estim = not (deduce_dep(data, X, Y, list(Zs), 1, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester))
+            deduce_estim = not (deduce_dep(data, X, Y, list(Zs), 0, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester))
         else:
             deduce_estim = False
 

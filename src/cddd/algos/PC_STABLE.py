@@ -55,6 +55,7 @@ def pc_stable(data, alpha, reliability_criterion='classic', is_orientation=False
 
     ci_number += len(add_ci_set)
     if not is_orientation:
+        adj_mat = np.array(adj_mat)
         return adj_mat, sepsets, ci_number
     else:
         adj_mat = np.array(adj_mat)
