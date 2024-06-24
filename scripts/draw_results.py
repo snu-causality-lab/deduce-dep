@@ -148,16 +148,16 @@ def new_correction_draw(results_dir, K):
         'alpha': [0.01, 0.05]
     }
 
-    BNs = ['alarm', 'asia', 'child', 'insurance', 'sachs', 'water']
+    BNs = ['alarm', 'insurance', 'sachs']
 
 
     crit_dicts = [{crit_k: crit_v for crit_k, crit_v in zip(crits.keys(), crit_vs)}
                   for crit_vs in itertools.product(*[crits[k] for k in crits.keys()])]
 
     for metric in ('F1', 'Precision', 'Recall'):
-        fig = plt.figure(figsize=(6.5, 5.25))
+        fig = plt.figure(figsize=(6, 3.25))
         # fig = plt.figure(figsize=(9, 9))
-        grid = gridspec.GridSpec(2, 3, figure=fig)
+        grid = gridspec.GridSpec(1, 3, figure=fig)
         plt.subplots_adjust(wspace=0, hspace=1)
         x = []
         ax_idx = -1
@@ -195,7 +195,7 @@ def new_correction_draw(results_dir, K):
 
             ax.set_xticks(x)
             ax.set_title(BN)
-            if ax_idx >= 3:
+            if ax_idx >= 0:
                 ax.set_xlabel('size of dataset')
             if ax_idx == 2:
                 custom_lines = [Line2D([0], [0], color=plt.cm.Paired(5), lw=1),
@@ -212,14 +212,14 @@ def new_correction_draw(results_dir, K):
             ytick_candidates = np.arange(start, min(end, 1.05), 0.2)
             ax.yaxis.set_ticks(ytick_candidates)
 
-            if ax_idx <= 2:
+            if ax_idx <= 0:
                 ax.set_xlabel(None)
             if ax_idx % 3:
                 ax.set_ylabel(None)
                 ax.set_yticklabels([])
             else:
                 ax.set_ylabel(metric)
-            if ax_idx < 3:
+            if ax_idx < 0:
                 ax.set_xticklabels([])
             else:
                 ax.set_xticklabels(x, rotation=45)
@@ -407,8 +407,8 @@ if __name__ == '__main__':
         draw_for_perf_experiments(results_dir, K, repeated=30)
 
     # draw for correction experiment
-    # correction_draw(results_dir)
+    correction_draw(results_dir)
 
     # draw for new correction experiment
-    # for K in [1,]:
-    #     new_correction_draw(results_dir, K)
+    for K in [1,]:
+        new_correction_draw(results_dir, K)
