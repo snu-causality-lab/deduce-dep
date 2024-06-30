@@ -80,7 +80,6 @@ def global_skeleton_metric_evaluation(true_adj_mat, estim_adj_mat):
 
 
 def get_SHD(oracle_adj_mat, estim_adj_mat):
-    # DAG -> CPDAG
     diff = np.abs(oracle_adj_mat - estim_adj_mat)
     diff = diff + diff.transpose()
     diff[diff > 1] = 1

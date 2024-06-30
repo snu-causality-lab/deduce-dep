@@ -30,10 +30,10 @@ if __name__ == '__main__':
     # Ks = [0, 1, 2]
     # orientations = [False]
 
-    BNs = ['sachs']
+    BNs = ['alarm', 'insurance', 'sachs', 'child']
     Algos = ['PC']
     CITs = ['G2'] * len(BNs)
-    dataset_sizes_for_perf = (200, 500, 1000)
+    dataset_sizes_for_perf = (200, 500, 1000, 2000)
     num_sampling_for_perf = 30
     reliability_criteria = ['no', 'deductive_reasoning']
     Ks = [1]
