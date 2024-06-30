@@ -288,7 +288,7 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
     # df = pd.read_csv(WORK_DIR + 'all_algo.csv')
     df = pd.read_csv(results_dir + f'/all_algo_{K}.csv')
     algos = ['HITON-PC', 'PC']
-    networks = ['alarm', 'sachs', 'insurance', 'asia', 'child', 'water']
+    networks = ['alarm', 'sachs', 'insurance', 'child']
     alphas = [0.01, 0.05]
     # criteria = {'algo': algos, 'BN': networks, 'alpha': alphas}
     mapping = {'HITON-PC': 'HITON', 'PC': 'PC', 'alarm': 'Alarm', 'sachs': 'Sachs', 'insurance': 'Insurance',
@@ -312,8 +312,8 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
 
     for metric in ('F1', 'Precision', 'Recall', 'Time', 'CI_number'):
         # fig = plt.figure(figsize=(12, 15))
-        fig = plt.figure(figsize=(9, 7))
-        grid = gridspec.GridSpec(3, 4, figure=fig)
+        fig = plt.figure(figsize=(8, 5))
+        grid = gridspec.GridSpec(2, 4, figure=fig)
         plt.subplots_adjust(wspace=1, hspace=1)
         x = []
         for ax_idx, (network, algo) in enumerate(itertools.product(networks, algos)):
@@ -348,9 +348,9 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
 
             ax.set_xticks(x)
             ax.set_title(f'{mapping[network] if network in mapping else network} ({mapping[algo]})')
-            if ax_idx >= 9:
+            if ax_idx >= 4:
                 ax.set_xlabel('size of dataset')
-            if ax_idx == 11:
+            if ax_idx == 7:
                 custom_lines = [Line2D([0], [0], color=plt.cm.Paired(5), lw=1),
                                 Line2D([0], [0], color=plt.cm.Paired(1), lw=1)]
 
@@ -358,7 +358,7 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
                                  ['as-is', 'w/ DD'],
                                  loc=4 if metric in {'F1', 'Precision', 'Recall'} else 2, frameon=False)
 
-            if ax_idx <= 8:
+            if ax_idx <= 3:
                 ax.set_xlabel(None)
             if ax_idx % 4:
                 ax.set_ylabel(None)
@@ -368,7 +368,7 @@ def draw_for_perf_experiments(results_dir, K, repeated=10):
                 else:
                     ax.set_ylabel(metric)
 
-            if ax_idx < 8:
+            if ax_idx < 4:
                 ax.set_xticklabels([])
             else:
                 ax.set_xticklabels(x, rotation=45)

@@ -7,6 +7,19 @@ from cddd.deductive_reasoning import deduce_dep
 
 
 def get_num_of_parameters(data, target, x, z):
+    '''
+    Return the total number of parameters of contingency table in CIT.
+
+    Args:
+        data: the sampled dataset
+        target: the variable of interest from CI query (target;X|Z)
+        x: the variable of interest from CI query (target;X|Z)
+        z: the conditioning set from CI query (target;X|Z)
+
+    Returns:
+        the total number of parameters for contingency table in CIT
+
+    '''
     num_of_domain_target = len(data[target].unique())
     num_of_domain_x = len(data[x].unique())
     if z:
@@ -20,6 +33,25 @@ def get_num_of_parameters(data, target, x, z):
 
 
 def HITON_PC(data, assoc, target, alpha, reliability_criterion='classic', K=1, ci_tester=None):
+    '''
+    Learn parents-children (PC) set of target variable with HITON-PC algorithm.
+
+    Args:
+        data: the sampled dataset
+        assoc: the marker where association between two variables are recorded
+        target: target variable(s)
+        alpha: the significance level for CIT to use
+        reliability_criterion: reliability criterion for structure learning
+        K: threshold value for deduce-dep
+        ci_tester: the name of CIT
+
+    Returns:
+        TPC: tentative parent-children sets for target variable(s)
+        sepsets: a dictionary for CI queries with independence results
+        ci_number: the total number of CIT performed
+
+    '''
+
     size_of_dataset, num_of_variables = np.shape(data)
     # Redesign sepsets
     sepsets = dict()

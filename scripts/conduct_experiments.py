@@ -21,7 +21,7 @@ if __name__ == '__main__':
     num_sampling_for_corr = 50
 
     # Experimental settings for performance experiment
-    BNs = ['alarm', 'insurance', 'sachs', 'asia', 'water', 'child']
+    BNs = ['alarm', 'insurance', 'sachs', 'child']
     Algos = ['PC', 'HITON-PC']
     CITs = ['G2'] * len(BNs)
     dataset_sizes_for_perf = (200, 500, 1000, 2000)

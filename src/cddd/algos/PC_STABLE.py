@@ -8,6 +8,23 @@ from cddd.deductive_reasoning import deduce_dep
 
 
 def pc_stable(data, alpha, reliability_criterion='classic', is_orientation=False, K=1, ci_tester=None):
+    '''
+    learn a graphical structure from sampled data with pc-stable algorithm.
+
+    Args:
+        data: the sampled dataset
+        alpha: the significance level for CIT to use
+        reliability_criterion: the reliability criterion for structure learning
+        is_orientation: whether an orientation step is performed
+        K: threshold value for deduce-dep
+        ci_tester: CIT to use
+
+    Returns:
+        adj_mat: adjacency matrix from structure learning
+        sepsets: a dictionary for CI queries with independence results
+        ci_number: the total number of CIT performed
+
+    '''
     size_of_dataset, num_of_variables = np.shape(data)
     adj_mat = [[1 if i != j else 0 for j in range(num_of_variables)] for i in range(num_of_variables)]
     sepsets = dict()

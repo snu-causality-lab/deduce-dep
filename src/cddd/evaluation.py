@@ -163,7 +163,6 @@ def HITON_PC_evaluation(path, all_number_Para, target_list, real_graph_path, rul
 def PC_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic',
                          K=1, ci_tester=None, is_orientation = False):
     # pre_set variables are zero
-    # adj_accuracies = []
     adj_f1s = []
     adj_precisions = []
     adj_recalls = []
@@ -185,7 +184,6 @@ def PC_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, relia
         _, adj_precision, adj_recall, adj_f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
         SHD = get_SHD(oracle_adj_mat, estim_adj_mat)
 
-        # adj_accuracies.append(adj_accuracy)
         adj_precisions.append(adj_precision)
         adj_recalls.append(adj_recall)
         adj_f1s.append(adj_f1)
@@ -194,7 +192,6 @@ def PC_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, relia
         CI_numbers.append(ci_number)
         Times.append(time_lapsed)
 
-    # adj_accuracies_mean, adj_accuracies_std = np.mean(adj_accuracies), np.std(adj_accuracies)
     adj_f1s_mean, adj_f1s_std = np.mean(adj_f1s), np.std(adj_f1s)
     adj_precisions_mean, adj_precisions_std = np.mean(adj_precisions), np.std(adj_precisions)
     adj_recalls_mean, adj_recalls_std = np.mean(adj_recalls), np.std(adj_recalls)
