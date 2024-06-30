@@ -87,8 +87,8 @@ def get_SHD(oracle_adj_mat, estim_adj_mat):
     return np.sum(diff) / 2
 
 
-def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, filenumber=10, alaph=0.01,
-                    reliability_criterion='classic', K=1, ci_tester=None):
+def HITON_PC_evaluation(path, all_number_Para, target_list, real_graph_path, rule, filenumber=10, alaph=0.01,
+                        reliability_criterion='classic', K=1, ci_tester=None):
     # pre_set variables are zero
     Precision = 0
     Recall = 0
@@ -160,72 +160,8 @@ def cond_evaluation(path, all_number_Para, target_list, real_graph_path, rule, f
         F1s_std, Precisions_std, Recalls_std, CI_numbers_std, Times_std
 
 
-def pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic', K=1,
-                         ci_tester=None):
-    # pre_set variables are zero
-    Accuracy = 0
-    Precision = 0
-    Recall = 0
-    F1 = 0
-    total_ci_number = 0
-    total_time = 0
-
-    F1s = []
-    Precisions = []
-    Recalls = []
-    CI_numbers = []
-    Times = []
-
-    _, all_number_Para = np.shape(pd.read_csv(path + str(1) + ".csv"))
-
-    true_graph = nx.DiGraph(true_adj_mat := get_adj_mat(all_number_Para, real_graph_path))
-    oracle_adj_mat = pc_stable_oracle(true_adj_mat, true_graph)
-
-    for m in range(filenumber):
-        completePath = path + str(m + 1) + ".csv"
-        data = pd.read_csv(completePath)
-        number, kVar = np.shape(data)
-        data.columns = [i for i in range(kVar)]
-
-        start_time = time.time()
-        estim_adj_mat, sepsets, ci_number = pc_stable(data, alpha, reliability_criterion=reliability_criterion, is_orientation=False, K=K, ci_tester=ci_tester)
-        end_time = time.time()
-        time_lapsed = end_time - start_time
-        accuracy, precision, recall, f1 = global_skeleton_metric_evaluation(oracle_adj_mat, estim_adj_mat)
-
-        F1s.append(f1)
-        Precisions.append(precision)
-        Recalls.append(recall)
-        CI_numbers.append(ci_number)
-        Times.append(time_lapsed)
-
-        total_ci_number += ci_number
-        total_time += time_lapsed
-        Accuracy += accuracy
-        Precision += precision
-        Recall += recall
-        F1 += f1
-
-    commonDivisor = filenumber
-
-    F1s = np.array(F1s)
-    Precisions = np.array(Precisions)
-    Recalls = np.array(Recalls)
-    CI_numbers = np.array(CI_numbers)
-    Times = np.array(Times)
-
-    F1s_std = np.std(F1s)
-    Precisions_std = np.std(Precisions)
-    Recalls_std = np.std(Recalls)
-    CI_numbers_std = np.std(CI_numbers)
-    Times_std = np.std(Times)
-
-    return F1 / commonDivisor, Precision / commonDivisor, Recall / commonDivisor,  total_ci_number / commonDivisor, total_time / commonDivisor, \
-        F1s_std, Precisions_std, Recalls_std, CI_numbers_std, Times_std
-
-
-def complete_pc_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic',
-                                  K=1, ci_tester=None, is_orientation = False):
+def PC_stable_evaluation(path, real_graph_path, filenumber=10, alpha=0.01, reliability_criterion='classic',
+                         K=1, ci_tester=None, is_orientation = False):
     # pre_set variables are zero
     # adj_accuracies = []
     adj_f1s = []
@@ -289,20 +225,6 @@ def load_data(path, m):
     number, kVar = np.shape(data)
     data.columns = [i for i in range(kVar)]
     return data
-
-
-def get_adj_dict(real_graph_path):
-    # TODO
-    adj_dict = collections.defaultdict(list)
-    with open(real_graph_path) as fileobject:
-        i = 0
-        for line in fileobject:
-            a = line.split(" ")
-            for j, n in enumerate(a):
-                if int(n) == 1:
-                    adj_dict[i].append(j)
-            i += 1
-    return adj_dict
 
 
 def get_adj_mat(num_vars, real_graph_path):

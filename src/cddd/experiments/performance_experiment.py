@@ -1,8 +1,8 @@
 import pandas as pd
 
 from cddd.cit import ci_test_factory
-from cddd.evaluation import cond_evaluation
-from cddd.evaluation import pc_stable_evaluation, complete_pc_stable_evaluation
+from cddd.evaluation import HITON_PC_evaluation
+from cddd.evaluation import PC_stable_evaluation
 from cddd.utils import safe_save_to_csv
 
 
@@ -51,13 +51,13 @@ def performance_experiment(BN, size_of_sampled_dataset, sampling_number, algo, c
         list_target = [i for i in range(num_para)]
 
         for reliability_criterion in reliability_criterions:
-            outs = cond_evaluation(data_path, num_para, list_target, real_graph_path, 'AND', file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester)
+            outs = HITON_PC_evaluation(data_path, num_para, list_target, real_graph_path, 'AND', file_number, alpha, reliability_criterion, K=K, ci_tester=ci_tester)
             result.append([BN, size_of_sampled_dataset, reliability_criterion, *outs])
 
     elif algo == 'PC':
         for reliability_criterion in reliability_criterions:
-            outs = complete_pc_stable_evaluation(data_path, real_graph_path, file_number, alpha, reliability_criterion,
-                                                K=K, ci_tester=ci_tester, is_orientation = is_orientation)
+            outs = PC_stable_evaluation(data_path, real_graph_path, file_number, alpha, reliability_criterion,
+                                        K=K, ci_tester=ci_tester, is_orientation = is_orientation)
             result.append([BN, size_of_sampled_dataset, reliability_criterion, *outs])
 
     result_file_path = f'{working_dir}/results/{algo}_result_{alpha}_{K}.csv'
