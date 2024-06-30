@@ -17,7 +17,6 @@ def estimate_cpdag(skel_graph, sep_set):
         An estimated DAG.
     """
     dag = skel_graph
-    adj_mat = nx.to_numpy_array(dag)
     node_ids = skel_graph.nodes()
 
     for (i, j) in combinations(node_ids, 2):
@@ -31,14 +30,11 @@ def estimate_cpdag(skel_graph, sep_set):
 
         common_k = adj_i & adj_j
         for k in common_k:
-            if adj_mat[i, k] == 1 and adj_mat[k, i] == 0 and adj_mat[j, k] == 1 and adj_mat[k, j] == 0:
-                if (tuple(sorted([i, j])) in sep_set) and (k not in sep_set[tuple(sorted([i, j]))]):
-                    if dag.has_edge(k, i):
-                        # _logger.debug('S: remove edge (%s, %s)' % (k, i))
-                        dag.remove_edge(k, i)
-                    if dag.has_edge(k, j):
-                        # _logger.debug('S: remove edge (%s, %s)' % (k, j))
-                        dag.remove_edge(k, j)
+            if (tuple(sorted([i, j])) in sep_set) and (k not in sep_set[tuple(sorted([i, j]))]):
+                if dag.has_edge(k, i):
+                    dag.remove_edge(k, i)
+                if dag.has_edge(k, j):
+                    dag.remove_edge(k, j)
 
     # directly modifies the dag
     # apply_meeks_rule(dag)
