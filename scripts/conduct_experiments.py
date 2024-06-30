@@ -21,14 +21,23 @@ if __name__ == '__main__':
     num_sampling_for_corr = 50
 
     # Experimental settings for performance experiment
-    BNs = ['alarm', 'insurance', 'sachs', 'child']
-    Algos = ['PC', 'HITON-PC']
+    # BNs = ['alarm', 'insurance', 'sachs', 'child']
+    # Algos = ['PC', 'HITON-PC']
+    # CITs = ['G2'] * len(BNs)
+    # dataset_sizes_for_perf = (200, 500, 1000, 2000)
+    # num_sampling_for_perf = 30
+    # reliability_criteria = ['no', 'deductive_reasoning']
+    # Ks = [0, 1, 2]
+    # orientations = [False]
+
+    BNs = ['sachs']
+    Algos = ['PC']
     CITs = ['G2'] * len(BNs)
-    dataset_sizes_for_perf = (200, 500, 1000, 2000)
+    dataset_sizes_for_perf = (200, 500, 1000)
     num_sampling_for_perf = 30
     reliability_criteria = ['no', 'deductive_reasoning']
-    Ks = [0, 1, 2]
-    orientations = [False]
+    Ks = [1]
+    orientations = [True]
 
     # Common setting for both experiments
     Alphas = [0.05, 0.01]

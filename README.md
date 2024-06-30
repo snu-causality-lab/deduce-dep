@@ -1,8 +1,8 @@
 # Causal Discovery with Deductive Reasoning: One Less Problem
 
-This python package is for the paper titled Causal Discovery with Deductive Reasoning: One Less Problem submission submitted to UAI 2024 (under review.)
+This python package is for the paper titled Causal Discovery with Deductive Reasoning: One Less Problem (UAI 2024).
 
-Upon the requests by reviewers, we modified many parts of our codebase implementing additional functionalities during the short discussion period.
+Since submission, we modified many parts of our codebase implementing additional functionalities.
 Regardless, we organized python3 files into folders such as `scripts`, `experiments`, and `algos` (algorithms) where
 `scripts` folder is separated from module `cddd` in source folder `src`.
 Due to some code changes, we do not exactly reproduce the results
@@ -30,9 +30,12 @@ We will assume that you downloaded `CD_DD` in your home directory.
 ## Running Scripts
 
 To run the algorithms, you will need to 1) generate data, 2) conduct experiments, and 3) draw results.
-Those files in scripts folder, `scripts`
+Those files are in scripts folder, `scripts`
 
 `cd ~/CD_DD/scripts`
+
+You can either execute `bash run.sh` to run the complete process or run each of the following scripts individually. 
+Here are the details for each script:
 
 ### Generating Data:
 
