@@ -13,6 +13,22 @@ from cddd.utils import safe_save_to_csv
 
 def cached_pc_stable_experiment(Alphas, BN, Ks, ci_tester_name, reliability_criteria, sample_id, size_of_sampled_dataset,
                                 working_dir):
+    '''
+    efficiently conduct performance experiment with pc-stable (skeleton discovery) using cache
+
+    Args:
+        Alphas: significance level for CIT to use
+        BN: the name of Bayesian network
+        Ks: threshold for deduce-dep
+        ci_tester_name: the name of CIT
+        reliability_criteria: reliability criterion used in structure learning
+        sample_id: the ID of sampled dataset
+        size_of_sampled_dataset: the size of sampled dataset
+        working_dir: working directory
+
+    Returns: None
+
+    '''
     COLUMNS = ['sample_id', 'BN', 'size_of_sampled_dataset', 'reliability_criterion',
                'Accuracy', 'Precision', 'Recall', 'F1', 'CI_number']
 
@@ -31,6 +47,20 @@ def cached_pc_stable_experiment(Alphas, BN, Ks, ci_tester_name, reliability_crit
 
 
 def load_data(BN, sample_id, size_of_sampled_dataset, working_dir):
+    '''
+    load data for performance experiment
+
+    Args:
+        BN: the name of Bayesian network
+        sample_id: the ID of sampled dataset
+        size_of_sampled_dataset: the size of sampled dataset
+        working_dir: working directory
+
+    Returns:
+        data : sampled dataset
+        oracle_adj_mat = ground truth of DAG
+
+    '''
     real_graph_path = f"{working_dir}/data/Ground_truth/{BN}_true.txt"
     data_path = f"{working_dir}/data/Sampled_datasets/{BN}_{size_of_sampled_dataset}_v{sample_id}.csv"
     data = pd.read_csv(data_path)

@@ -22,6 +22,18 @@ H = TypeVar('H', bound=Hashable)
 
 
 def sample_synthetic_dataset(num_vars, edge_ratio, sampling_number, size, working_dir, seed=None):
+    '''
+    sample datasets from Bayesian network with random DAG
+    Args:
+        num_vars: number of variables in random graph
+        edge_ratio: the number of edges / the number of variables
+        sampling_number: the total number of sampling datasets
+        size: the size of sampled dataset
+        working_dir: working directory
+        seed: random seed for sampling
+
+    Returns: None
+    '''
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
@@ -46,12 +58,25 @@ def sample_synthetic_dataset(num_vars, edge_ratio, sampling_number, size, workin
 
 
 def sample_ER_dataset(num_vars, edge_ratio, num_sampling, size, working_dir, seed=None):
+    '''
+    sample datasets from Bayesian network with random DAG (ER from networkx)
+    Args:
+        num_vars: number of variables in random graph
+        edge_ratio: the number of edges / the number of variables
+        num_sampling: the total number of sampling datasets
+        size: the size of sampled dataset
+        working_dir: working directory
+        seed: random seed for sampling
+
+    Returns: None
+    '''
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
 
     num_edges = int(num_vars * edge_ratio)
     BN_name = f'ER_{num_vars}_{num_edges}'
+
     # randomly generate a Bayesian network
     graph = Erdos_Renyi_DAG(num_vars, num_edges)
     CPTs = random_CPTs(graph)
@@ -74,6 +99,17 @@ def sample_ER_dataset(num_vars, edge_ratio, num_sampling, size, working_dir, see
 # Loading DAG with model parameters from bif file.
 
 def sample_from_bif(working_dir, bif_bn, sizes, sampling_number):
+    '''
+    sample datasets from semi-synthetic Bayesian networks with BIF file
+    Args:
+        working_dir: working directory
+        bif_bn: bif file for Bayesian network
+        sizes: size of sampled dataset
+        sampling_number: the total number of sampling datasets
+
+    Returns: None
+
+    '''
     bif_file = f'{working_dir}/data/bifs/{bif_bn}.bif'
     model = bn.import_DAG(bif_file, CPD=True, verbose=0)
 
@@ -106,6 +142,18 @@ def sample_from_bif(working_dir, bif_bn, sizes, sampling_number):
 
 
 def sample_linear_sem(num_vars, edge_ratio, num_sampling, size, working_dir, seed=None):
+    '''
+    sample datasets from Bayesian network with linear SEM (Erdös-Renyi Graph)
+    Args:
+        num_vars: number of variables in random graph
+        edge_ratio: the number of edges / the number of variables
+        num_sampling: the total number of sampling datasets
+        size: the size of sampled dataset
+        working_dir: working directory
+        seed: random seed for sampling
+
+    Returns: None
+    '''
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
@@ -149,6 +197,18 @@ def sample_linear_sem(num_vars, edge_ratio, num_sampling, size, working_dir, see
 
 
 def sample_linear_sem_sf(num_vars, edge_to_attach, num_sampling, size, working_dir, seed=None):
+    '''
+    sample datasets from Bayesian network with linear SEM (Scale-Free Network)
+    Args:
+        num_vars: number of variables in random graph
+        edge_ratio: the number of edges / the number of variables
+        num_sampling: the total number of sampling datasets
+        size: the size of sampled dataset
+        working_dir: working directory
+        seed: random seed for sampling
+
+    Returns: None
+    '''
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
@@ -192,6 +252,19 @@ def sample_linear_sem_sf(num_vars, edge_to_attach, num_sampling, size, working_d
 
 
 def sample_nonlinear_sem(num_vars, edge_ratio, num_sampling, size, working_dir, seed=None):
+    '''
+    sample datasets from Bayesian network with nonlinear SEM (Erdös-Renyi Graph)
+    Args:
+        num_vars: number of variables in random graph
+        edge_ratio: the number of edges / the number of variables
+        num_sampling: the total number of sampling datasets
+        size: the size of sampled dataset
+        working_dir: working directory
+        seed: random seed for sampling
+
+    Returns: None
+    '''
+
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)

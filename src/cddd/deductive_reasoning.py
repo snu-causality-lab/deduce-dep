@@ -1,4 +1,21 @@
 def deduce_dep(data, X, Y, Z, k, alpha, add_ci_set, sepsets, consets=None, ci_tester=None):
+    '''
+    recursively deduce a dependence statement from CIT results
+    Args:
+        data: given dataset
+        X: variable of interest
+        Y: variable of interest
+        Z: conditioning set
+        k: recursion threshold for deduce-dep
+        alpha: the significance level for CIT to use
+        add_ci_set: indicator for counting the total number of CIT performed
+        sepsets: a dictionary of CI queries with independence results
+        consets: a dictionary of CI queries with dependence results
+        ci_tester: CIT to use
+
+    Returns: whether dependence is deducible or not (Boolean)
+
+    '''
     if consets is None:
         consets = dict()
     if len(Z) > k:

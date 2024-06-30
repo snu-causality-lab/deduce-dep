@@ -35,9 +35,9 @@ def performance_experiment(BN, size_of_sampled_dataset, sampling_number, algo, c
 
     if algo == 'PC':
         columns = ['BN', 'size_of_sampled_dataset', 'reliability_criterion',
-                   'accuracy', 'f1', 'precision', 'recall',
+                   'F1', 'Precision', 'Recall',
                    'SHD', 'CI_number', 'Time',
-                   'accuracy_std', 'f1_std', 'precision_std', 'recall_std',
+                   'F1_std', 'Precision_std', 'recall_std',
                    'SHD_std', 'CI_number_std', 'Time_std']
 
     # experiment results

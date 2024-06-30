@@ -14,6 +14,21 @@ from cddd.utils import safe_save_to_csv
 
 
 def new_correction_experiment(BN, alpha, K, ci_tester_name, working_dir, dataset_size, sample_id):
+    '''
+    Conduct additional correction experiments with semi-synthetic Bayesian network data
+
+    Args:
+        BN: the name of Bayesian network
+        alpha: the significance level for CIT to use
+        K: threshold value for deduce-dep
+        ci_tester_name: the name of CIT
+        working_dir: working directory
+        dataset_size: the size of sampled dataset
+        sample_id: the ID of sampled dataset
+
+    Returns: None
+
+    '''
     # experiments settings
     random.seed(0)
     ci_tester = ci_test_factory(ci_tester_name)
@@ -47,6 +62,25 @@ def new_correction_experiment(BN, alpha, K, ci_tester_name, working_dir, dataset
 
 
 def __new_correction_experiment_core(BN, K, alpha, data, num_vars, size_of_sampled_dataset, true_graph, n_repeats=20, ci_tester=None):
+    '''
+    Returns the result of correction experiment with semi-synthetic Bayesian network dataset.
+
+    Args:
+        BN: the name of Bayesian network
+        K: threshold value for deduce-dep
+        alpha: the significance level for CIT to use
+        data: the sampled dataset
+        num_vars: the number of variables
+        size_of_sampled_dataset: the size of sampled dataset
+        true_graph: the adjacency matrix of true graph
+        n_repeats: the total number of examining random queries
+        ci_tester: the name of CIT
+
+    Returns:
+        results_mth: pandas dataframe with f1 score, precision, recall from new correction experiment
+    '''
+
+
     result_mth = []
     sepsets = dict()
     consets = dict()
