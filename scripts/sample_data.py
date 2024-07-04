@@ -328,7 +328,7 @@ if __name__ == '__main__':
 
     # generate data for BNLearn models
     print('generating datasets for known BNLearn graphs...')
-    BIF_BNs = ('alarm', 'asia', 'child', 'insurance', 'sachs', 'water')
+    BIF_BNs = ('alarm', 'child', 'insurance', 'sachs', )
     for bif_bn in BIF_BNs:
         print(f'    {bif_bn} ... ')
         sample_from_bif(WORKING_DIR, bif_bn, dataset_sizes, num_sampling)
@@ -351,9 +351,9 @@ if __name__ == '__main__':
         in enumerate(product(nums_vars, edge_ratios, [i for i in range(num_sampling)], dataset_sizes))
     )
 
-    edge_ratios = (1.8, 3.2)
-    edges_to_attach = (2, 4)  # for scale-free networks
-    dataset_sizes = (30, 50, 100, 150)
+    # edge_ratios = (1.8, 3.2)
+    # edges_to_attach = (2, 4)  # for scale-free networks
+    # dataset_sizes = (30, 50, 100, 150)
 
     # print('generating linear SEM datasets.')  # post-submission : Linear SEM ER
     # # generate data from linear SEM

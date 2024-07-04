@@ -7,14 +7,6 @@ from cddd.algos.algo_utils import estimate_cpdag
 from cddd.utils import DAG_to_CPDAG
 
 
-# def pc_stable_oracle(true_adj_mat, true_graph, is_orientation=False):
-#     if not is_orientation:
-#         true_adj_mat = np.array(true_adj_mat)
-#         true_skeleton_mat = true_adj_mat + true_adj_mat.T
-#         return true_skeleton_mat
-#     return DAG_to_CPDAG(true_adj_mat)
-
-
 def pc_stable_oracle(true_adj_mat, true_graph, is_orientation=False):
     if not is_orientation:
         true_skeleton_mat = np.array(true_adj_mat)
@@ -53,3 +45,9 @@ def pc_stable_oracle(true_adj_mat, true_graph, is_orientation=False):
 
     return adj_mat
 
+# def pc_stable_oracle(true_adj_mat, true_graph, is_orientation=False):
+#     if not is_orientation:
+#         true_adj_mat = np.array(true_adj_mat)
+#         true_skeleton_mat = true_adj_mat + true_adj_mat.T
+#         return true_skeleton_mat
+#     return DAG_to_CPDAG(true_adj_mat)

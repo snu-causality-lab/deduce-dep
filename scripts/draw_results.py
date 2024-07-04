@@ -407,8 +407,8 @@ if __name__ == '__main__':
         draw_for_perf_experiments(results_dir, K, repeated=30)
 
     # # draw for correction experiment
-    # correction_draw(results_dir)
-    #
+    correction_draw(results_dir)
+
     # # draw for new correction experiment
-    # for K in [1,]:
-    #     new_correction_draw(results_dir, K)
+    for K in [1,]:
+        new_correction_draw(results_dir, K)
