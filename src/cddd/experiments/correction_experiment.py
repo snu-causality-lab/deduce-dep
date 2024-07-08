@@ -71,7 +71,7 @@ def __correction_experiment_core(working_dir, num_vars, time_vars, sampling_numb
         stat_estim = (pval > alpha)
 
         if pval > alpha:
-            deduce_estim = not (deduce_dep(data, X, Y, list(Zs), 0, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester))
+            deduce_estim = not (deduce_dep(data, X, Y, list(Zs), 1, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester))
         else:
             deduce_estim = False
 
