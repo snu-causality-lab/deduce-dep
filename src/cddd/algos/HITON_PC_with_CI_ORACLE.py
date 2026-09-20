@@ -5,6 +5,11 @@ import numpy as np
 
 
 def HITON_PC_oracle(data, assoc, target, alpha, true_graph, ci_tester=None):
+    """Run HITON-PC-NonSym with graph-based CI decisions at every order.
+
+    Statistical association scores retain the original candidate ordering.
+    The returned algorithm reference need not equal the graph's neighbor set.
+    """
     size_of_dataset, num_of_variables = np.shape(data)
     sepsets = dict()
     OPEN = []
@@ -12,10 +17,10 @@ def HITON_PC_oracle(data, assoc, target, alpha, true_graph, ci_tester=None):
 
     total_variables = [var for var in range(num_of_variables) if var != target]
     for x in total_variables:
-        pval_gp, dep_gp = ci_tester.ci_test(data, target, x, [])
+        _, dep_gp = ci_tester.ci_test(data, target, x, [])
         assoc[target][x] = dep_gp
 
-        if pval_gp <= alpha:
+        if not nx.d_separated(true_graph, {target}, {x}, set()):
             OPEN.append(x)
         else:
             sepsets[tuple(sorted([target, x]))] = []

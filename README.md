@@ -67,6 +67,19 @@ Note that the code may not output plots properly if some of experiments are not 
 
 `python3 draw_results.py`
 
+## Regression tests
+
+After installing the package dependencies, install `pytest` and run from the repository root:
+
+```sh
+python -m pip install pytest
+PYTHONPATH=src python -m pytest tests -q
+```
+
+These tests cover deduction with cached CI results, the HITON-PC oracle's CI decisions,
+and score standard deviations across repetitions. They use small graphs and controlled
+CI responses; they do not rerun the paper's experiments.
+
 ## Citation
 If you find our work useful for your research, please consider citing our paper.
 ```bib
@@ -77,4 +90,4 @@ If you find our work useful for your research, please consider citing our paper.
   year={2024},
   publisher={PMLR}
 }
-
+```

@@ -9,8 +9,8 @@ def deduce_dep(data, X, Y, Z, k, alpha, add_ci_set, sepsets, consets=None, ci_te
         k: recursion threshold for deduce-dep
         alpha: the significance level for CIT to use
         add_ci_set: indicator for counting the total number of CIT performed
-        sepsets: a dictionary of CI queries with independence results
-        consets: a dictionary of CI queries with dependence results
+        sepsets: maps variable pairs to a cached independent conditioning set
+        consets: maps variable pairs to a cached dependent conditioning set
         ci_tester: CIT to use
 
     Returns: whether dependence is deducible or not (Boolean)
@@ -20,37 +20,35 @@ def deduce_dep(data, X, Y, Z, k, alpha, add_ci_set, sepsets, consets=None, ci_te
         consets = dict()
     if len(Z) > k:
         for z in Z:
-            remaining_Z = tuple(list((set(Z) - {z})))
+            remaining_Z = tuple(sorted(set(Z) - {z}))
+            independent = []
 
             for A, B, C in [(X, Y, remaining_Z), (X, z, remaining_Z), (Y, z, remaining_Z)]:
-                is_already_identified = False
-
-                if tuple(sorted([A, B])) in sepsets and sepsets[tuple(sorted([A, B]))] == C:
-                    pval = 1
-                    is_already_identified = True
-
-                elif tuple(sorted([A, B])) in consets and consets[tuple(sorted([A, B]))] == C:
-                    pval = 0
-
+                pair = tuple(sorted([A, B]))
+                if pair in sepsets and tuple(sorted(sepsets[pair])) == C:
+                    is_independent = True
+                elif pair in consets and tuple(sorted(consets[pair])) == C:
+                    is_independent = False
                 else:
                     pval, _ = ci_tester.ci_test(data, A, B, C)
                     add_ci_set.append('1')
+                    is_independent = pval > alpha
+                    if is_independent:
+                        is_independent = not deduce_dep(
+                            data, A, B, C, k, alpha, add_ci_set, sepsets,
+                            consets, ci_tester=ci_tester)
+                    if is_independent:
+                        sepsets[pair] = C
+                    else:
+                        consets[pair] = C
 
-                if pval > alpha:
-                    if not is_already_identified:
-                        if not deduce_dep(data, A, B, C, k, alpha, add_ci_set, sepsets, consets, ci_tester=ci_tester):
-                            sepsets[tuple(sorted([A, B]))] = C
-                        else:
-                            consets[tuple(sorted([A, B]))] = C
-
-                else:
-                    consets[tuple(sorted([A, B]))] = C
-
-                if tuple(sorted([X, Y])) not in sepsets:
-                    if (tuple(sorted([X, z])) in sepsets and sepsets[(tuple(sorted([X, z])))] == remaining_Z) or (tuple(sorted([Y, z])) in sepsets and sepsets[(tuple(sorted([Y, z])))] == remaining_Z):
-                        return True
-
-            if tuple(sorted([X, Y])) in sepsets and sepsets[tuple(sorted([X, Y]))] == remaining_Z:
-                if (tuple(sorted([X, z])) not in sepsets) and (tuple(sorted([Y, z])) not in sepsets):
+                # Each cache retains only one conditioning set per pair.
+                # Apply the rules to these actual query results, never to
+                # pair membership or absence under another conditioning set.
+                independent.append(is_independent)
+                if len(independent) > 1 and not independent[0] and is_independent:
                     return True
+
+            if independent[0] and not independent[1] and not independent[2]:
+                return True
     return False

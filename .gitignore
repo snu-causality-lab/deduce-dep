@@ -2,3 +2,5 @@
 results
 data/Ground_truth
 data/Sampled_datasets
+__pycache__/
+.pytest_cache/
