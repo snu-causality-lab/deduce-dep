@@ -134,12 +134,17 @@ def HITON_PC_evaluation(path, all_number_Para, target_list, real_graph_path, rul
             ResPC[i] = PC
 
         correction(ResPC, rule)
-        Distance, F1, Precision, Recall = local_metric_evaluation(Distance, F1, Precision, Recall, ResPC, OraclePC,
-                                                                  target_list)
+        distance, f1, precision, recall = local_metric_evaluation(
+            0, 0, 0, 0, ResPC, OraclePC, target_list)
+        Distance += distance
+        F1 += f1
+        Precision += precision
+        Recall += recall
 
-        F1s.append(F1 / (length_targets * (m + 1)))
-        Precisions.append(Precision / (length_targets * (m + 1)))
-        Recalls.append(Recall / (length_targets * (m + 1)))
+        # Dispersion is across repetitions, after averaging over targets.
+        F1s.append(f1 / length_targets)
+        Precisions.append(precision / length_targets)
+        Recalls.append(recall / length_targets)
 
     commonDivisor = length_targets * filenumber
 
